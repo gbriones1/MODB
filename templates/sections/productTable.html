@@ -1,3 +1,4 @@
+{% load custom_tags %}
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <div class="row">
         <h2>
@@ -127,7 +128,14 @@
                       </button>
                       <ul class="dropdown-menu" role="menu">
                         <li role="presentation" class="dropdown-header">Filtrar</li>
-                        <li class="filter-menu"><input type="text" class="input-filter form-control" data-field="application"></li>
+                        <li class="filter-menu">
+                            <select type="text" class="multi-select-filter form-control" data-field="appliance">
+                                <option value=""></option>
+                                {% for appliance in appliances %}
+                                    <option value="{{ appliance.id }}">{{ appliance.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </li>
                       </ul>
                     </div>
                 </th>
@@ -149,7 +157,7 @@
                 <th>
                     <div class="btn-group btn-input clearfix filter-btn">
                       <button type="button" class="btn btn-default dropdown-toggle btn-block form-control" data-toggle="dropdown" aria-expanded="false">
-                        Clasificacion <span class="caret"></span>
+                        Porcentaje <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" role="menu">
                         <li role="presentation" class="dropdown-header">Ordenar</li>
@@ -231,7 +239,7 @@
             </thead>
             <tbody>
                 {% for product in products %}
-                <tr id="{{ product.code }}" data-code="{{ product.code }}" data-brand="{{ product.brand.id }}" data-provider="{{ product.provider.id }}" data-name="{{ product.name }}" data-description="{{ product.description }}" data-price="{{ product.price }}" data-classification="{{ product.classification.id }}">
+                <tr id="{{ product.code }}" data-code="{{ product.code }}" data-brand="{{ product.brand.id }}" data-provider="{{ product.provider.id }}" data-name="{{ product.name }}" data-description="{{ product.description }}" data-price="{{ product.price }}" data-classification="{{ product.classification.id }}" data-appliance="{% for appliance in product.appliance.all %}{{ appliance.id }}:{% endfor %}">
                     <td><input type="checkbox" class="checkthis" value="{{ product.code }}" /></td>
                     <td>{{ product.code }}</td>
                     <td>{{ product.brand }}</td>
@@ -245,7 +253,7 @@
                         {% endfor %}
                         </ul>
                     </td>
-                    <td>${{ product.price }}</td>
+                    <td>${{ product.real_price }}</td>
                     <td>{{ product.classification }}</td>
                     {% if storage == "C" %}
                     <td>{{ product.in_consignment }}</td>

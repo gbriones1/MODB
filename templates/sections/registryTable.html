@@ -77,6 +77,9 @@
                             {% for product in reg.lending_product_set.all %}
                             <tr><td>{{ product.product.code }}</td><td>{{ product.product.name }}</td><td>{{ product.amount }}</td></tr>
                             {% endfor %}
+                            {% for tool in reg.lending_tool_set.all %}
+                            <tr><td>{{ tool.tool.code }}</td><td>{{ tool.tool.name }}</td><td>{{ tool.amount }}</td></tr>
+                            {% endfor %}
                             </tbody>
                         </table>
                     </td>

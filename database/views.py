@@ -3,10 +3,11 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
-from database.models import Product, Input, Output, Lending, Input_Product, Output_Product, Lending_Product, Provider, Appliance, Classification, Brand, Order, Configuration, Order_Product
-from database.forms import ProductForm, ProductInputForm, ProductOutputForm, ProductLendingForm, ProviderForm, ApplianceForm, BrandForm, ClassificationForm, UpdateProviderForm, UpdateBrandForm, UpdateApplianceForm, UpdateClassificationForm, ConfigurationForm
+from database.models import Product, Tool, Input, Output, Lending, Input_Product, Output_Product, Lending_Product, Lending_Tool, Provider, Appliance, Classification, Brand, Order, Configuration, Order_Product
+from database.forms import ProductForm, ToolForm, ProductInputForm, ProductOutputForm, ProductLendingForm, ToolLendingForm, ProviderForm, ApplianceForm, BrandForm, ClassificationForm, UpdateProviderForm, UpdateBrandForm, UpdateApplianceForm, UpdateClassificationForm, ConfigurationForm, OrderInputForm
 from lib.email_client import send_email
 from datetime import datetime
+import calendar
 import json, operator
 import pdb
 
@@ -60,6 +61,7 @@ def dashboard(request):
     providers = Provider.objects.all()
     brands = Brand.objects.all()
     classifications = Classification.objects.all()
+    appliances = Appliance.objects.all()
     if request.method == "POST":
         redirect_url = "/"
         action = request.POST.get('action', '')
@@ -158,8 +160,45 @@ def dashboard(request):
         if order == 'desc':
             sort = "-"+sort
         products = products.order_by(sort)
+    for product in products:
+        product.real_price = product.price-product.price*product.discount/100
     # product_forms = {p.code:ProductForm(instance=p) for p in products}
     scripts = ["product"]
+    messages = get_messages(request)
+    return render_to_response('pages/dashboard.html', locals(), context_instance=RequestContext(request))
+
+@login_required
+def tools(request):
+    dashboard_active = "active"
+    tools_active = "active"
+    tools = Tool.objects.all()
+    if request.method == "POST":
+        action = request.POST.get('action', '')
+        if action == "CREATE":
+            form = ToolForm(request.POST)
+            if form.is_valid():
+                form.save()
+            else:
+                set_messages(request, [("Herramienta no creada, los datos no fueron validos", "danger")])
+        elif action == "UPDATE":
+            tool = Tool.objects.get(code=request.POST['code'])
+            form = ToolForm(request.POST, instance=tool)
+            if form.is_valid():
+                form.save()
+            else:
+                set_messages(request, [("Herramienta no actualizada, los nuevos datos no son validos", "danger")])
+        elif action == "DELETE":
+            for tool in Tool.objects.filter(code__in=json.loads(str(request.POST.get('code',"[]")))):
+                tool.delete()
+        return HttpResponseRedirect("/tools/")
+    form = ToolForm()
+    sort = request.GET.get("sort", '')
+    order = request.GET.get("order", '')
+    if sort:
+        if order == 'desc':
+            sort = "-"+sort
+        tools = tools.order_by(sort)
+    scripts = ["tool"]
     messages = get_messages(request)
     return render_to_response('pages/dashboard.html', locals(), context_instance=RequestContext(request))
 
@@ -172,11 +211,19 @@ def lendings(request):
     end_date = datetime.strptime(request.GET.get("end_date", now.strftime("%Y-%m-%d")), "%Y-%m-%d").date()
     formatted_start_date = start_date.strftime("%Y-%m-%d")
     formatted_end_date = end_date.strftime("%Y-%m-%d")
-    lendings = Lending.objects.filter(date__gte=start_date, date__lte=end_date.replace(day=end_date.day+1)).order_by('-date')
+    if calendar.monthrange(end_date.year, end_date.month)[1] == end_date.day:
+        if end_date.month == 12:
+            end_date = end_date.replace(year=end_date.year+1, month=1, day=1)
+        else:
+            end_date = end_date.replace(month=end_date.month+1, day=1)
+    else:
+        end_date = end_date.replace(day=end_date.day+1)
+    lendings = Lending.objects.filter(date__gte=start_date, date__lte=end_date).order_by('-date')
     if request.method == "POST":
         action = request.POST.get('action', '')
         if action == "CREATE":
             product_amount = json.loads(request.POST.get("lendingProducts", "{}"))
+            tool_amount = json.loads(request.POST.get("lendingTools", "{}"))
             storage = request.POST.get("storage", "")
             employee = request.POST.get("employee", "")
             destination = request.POST.get("destination", "")
@@ -195,6 +242,15 @@ def lendings(request):
                         product.in_used -= int(amount)
                     product_lending.save()
                     product.save()
+            elif tool_amount and employee and destination:
+                lending = Lending(storage=storage, employee=employee, destination=destination, date=date)
+                lending.save()
+                for toolCode, amount in tool_amount.iteritems():
+                    tool = Tool.objects.get(code=toolCode)
+                    tool_lending = Lending_Tool(tool=tool, amount=amount, lending=lending, returned_amount=0)
+                    tool.amount -= int(amount)
+                    tool_lending.save()
+                    tool.save()
             else:
                 set_messages(request, [("Prestamo no autorizado, los datos no fueron validos", "danger")])
         elif action == "DELETE":
@@ -211,6 +267,12 @@ def lendings(request):
                             product.in_used += product_lending.amount-product_lending.returned_amount
                         product.save()
                     product_lending.delete()
+                for tool_lending in delete_lending.lending_tool_set.all():
+                    if rollback == "true":
+                        tool = tool_lending.tool
+                        tool.amount += tool_lending.amount-tool_lending.returned_amount
+                        tool.save()
+                    tool_lending.delete()
                 delete_lending.delete()
         elif action == "RETURN":
             for return_lending in Lending.objects.filter(id__in=json.loads(str(request.POST.get('lending_id', "[]")))):
@@ -225,11 +287,18 @@ def lendings(request):
                         product.in_used += product_lending.returned_amount
                     product_lending.save()
                     product.save()
+                for tool_lending in return_lending.lending_tool_set.all():
+                    tool = tool_lending.tool
+                    tool_lending.returned_amount = int(request.POST["amount"+tool.code])
+                    tool.amount += tool_lending.returned_amount
+                    tool_lending.save()
+                    tool.save()
                 return_lending.returned = True
                 return_lending.returned_date = now
                 return_lending.save()
         return HttpResponseRedirect('/lendings/')
     form = ProductLendingForm()
+    toolForm = ToolLendingForm()
     scripts = ['productLending']
     messages = get_messages(request)
     return render_to_response('pages/dashboard.html', locals(), context_instance=RequestContext(request))
@@ -243,7 +312,14 @@ def inputs(request):
     end_date = datetime.strptime(request.GET.get("end_date", now.strftime("%Y-%m-%d")), "%Y-%m-%d").date()
     formatted_start_date = start_date.strftime("%Y-%m-%d")
     formatted_end_date = end_date.strftime("%Y-%m-%d")
-    inputs = Input.objects.filter(date__gte=start_date, date__lte=end_date.replace(day=end_date.day+1)).order_by('-date')
+    if calendar.monthrange(end_date.year, end_date.month)[1] == end_date.day:
+        if end_date.month == 12:
+            end_date = end_date.replace(year=end_date.year+1, month=1, day=1)
+        else:
+            end_date = end_date.replace(month=end_date.month+1, day=1)
+    else:
+        end_date = end_date.replace(day=end_date.day+1)
+    inputs = Input.objects.filter(date__gte=start_date, date__lte=end_date).order_by('-date')
     if request.method == "POST":
         action = request.POST.get('action', '')
         if action == "CREATE":
@@ -257,7 +333,7 @@ def inputs(request):
                     amount = definition["amount"]
                     price = float(definition["price"])
                     product = Product.objects.get(code=productId)
-                    if product.price != price:
+                    if float(product.price-product.price*product.discount/100) != price:
                         is_valid = False
                         messages.append(("El producto "+product.code+" - "+product.name+" a: $"+str(product.price)+" no coincide con el precio ingresado: $"+str(price), "danger"))
                 if is_valid:
@@ -265,7 +341,7 @@ def inputs(request):
                     new_input.save()
                     for productId, definition in product_amount.iteritems():
                         product = Product.objects.get(code=productId)
-                        product_input = Input_Product(product=product, amount=amount, price=product.price, input_reg=new_input)
+                        product_input = Input_Product(product=product, amount=amount, price=float(product.price-product.price*product.discount/100), input_reg=new_input)
                         if storage == "C":
                             product.in_consignment += int(amount)
                         elif storage == "S":
@@ -312,7 +388,14 @@ def outputs(request):
     end_date = datetime.strptime(request.GET.get("end_date", now.strftime("%Y-%m-%d")), "%Y-%m-%d").date()
     formatted_start_date = start_date.strftime("%Y-%m-%d")
     formatted_end_date = end_date.strftime("%Y-%m-%d")
-    outputs = Output.objects.filter(date__gte=start_date, date__lte=end_date.replace(day=end_date.day+1)).order_by('-date')
+    if calendar.monthrange(end_date.year, end_date.month)[1] == end_date.day:
+        if end_date.month == 12:
+            end_date = end_date.replace(year=end_date.year+1, month=1, day=1)
+        else:
+            end_date = end_date.replace(month=end_date.month+1, day=1)
+    else:
+        end_date = end_date.replace(day=end_date.day+1)
+    outputs = Output.objects.filter(date__gte=start_date, date__lte=end_date).order_by('-date')
     if request.method == "POST":
         action = request.POST.get('action', '')
         if action == "CREATE":
@@ -510,6 +593,13 @@ def registry(request):
 def product(request, id):
     form = ProductForm(instance=Product.objects.get(code=id))
     storage = request.GET.get("storage", '')
+    object_type = "Product"
+    return render_to_response('pages/dialog.html', locals(), context_instance=RequestContext(request))
+
+@login_required
+def tool(request, id):
+    form = ToolForm(instance=Tool.objects.get(code=id))
+    object_type = "Tool"
     return render_to_response('pages/dialog.html', locals(), context_instance=RequestContext(request))
 
 ### REPORTS VIEW ###
@@ -665,13 +755,79 @@ def shopping(request):
     end_date = datetime.strptime(request.GET.get("end_date", now.strftime("%Y-%m-%d")), "%Y-%m-%d").date()
     formatted_start_date = start_date.strftime("%Y-%m-%d")
     formatted_end_date = end_date.strftime("%Y-%m-%d")
-    orders = Order.objects.filter(date__gte=start_date, date__lte=end_date.replace(day=end_date.day+1)).order_by('-date')
+    if calendar.monthrange(end_date.year, end_date.month)[1] == end_date.day:
+        if end_date.month == 12:
+            end_date = end_date.replace(year=end_date.year+1, month=1, day=1)
+        else:
+            end_date = end_date.replace(month=end_date.month+1, day=1)
+    else:
+        end_date = end_date.replace(day=end_date.day+1)
+    orders = Order.objects.filter(date__gte=start_date, date__lte=end_date).order_by('-date')
     if request.method == "POST":
         action = request.POST.get('action', '')
         if action == "INPUT":
-            pass
+            for order in Order.objects.filter(id__in=json.loads(str(request.POST.get('order_id', "[]")))):
+                product_amount = {}
+                for order_product in order.order_product_set.all():
+                    code = order_product.product.code
+                    product_amount[code] = {"amount":request.POST.get(code, "0"), "price":request.POST.get("price"+code, "0")}
+                storage = request.POST.get("storage", "")
+                if product_amount and storage:
+                    is_valid = True
+                    messages = []
+                    for productId, definition in product_amount.iteritems():
+                        amount = definition["amount"]
+                        price = float(definition["price"])
+                        product = Product.objects.get(code=productId)
+                        if float(product.price-product.price*product.discount/100) != price:
+                            is_valid = False
+                            messages.append(("El producto "+product.code+" - "+product.name+" a: $"+str(product.price)+" no coincide con el precio ingresado: $"+str(price), "danger"))
+                    if is_valid:
+                        new_input = Input(storage=storage, date=now)
+                        new_input.save()
+                        for productId, definition in product_amount.iteritems():
+                            product = Product.objects.get(code=productId)
+                            product_input = Input_Product(product=product, amount=amount, price=float(product.price-product.price*product.discount/100), input_reg=new_input)
+                            if storage == "C":
+                                product.in_consignment += int(amount)
+                            elif storage == "S":
+                                product.in_stock += int(amount)
+                            elif storage == "U":
+                                product.in_used += int(amount)
+                            product_input.save()
+                            product.save()
+                        order.status = Order.STATUS_RECEIVED
+                        order.received_date = now
+                        order.save()
+                    else:
+                        conf = Configuration.objects.all()[0]
+                        if conf.mailOnPriceChange:
+                            if not conf.receiver_email or not send_email(conf.receiver_email, "BDMO Entrada con precios erroneos", "Entrada no autorizada del "+str(now)+" por las siguientes razones:\n"+"\n".join([x[0] for x in messages])):
+                                messages.append(("Correo de notificacion de precio diferente no enviado, correo no valido", "warning"))
+                    set_messages(request, messages)
+                else:
+                    set_messages(request, [("Entrada no autorizada, los datos no fueron validos", "danger")])
         if action == "RESEND":
-            pass
+            for order in Order.objects.filter(id__in=json.loads(str(request.POST.get('order_id', "[]")))):
+                if order.provider.email:
+                    message = request.POST.get("text", "")
+                    for order_product in order.order_product_set.all():
+                        product = order_product.product
+                        if product.code in request.POST.keys():
+                            order_product.amount = request.POST[product.code]
+                            order_product.save()
+                            message += "\n"+product.code+" - "+product.name+" "+product.description+". Cantidad: "+order_product.amount
+                        else:
+                            order_product.delete()
+                    if send_email(order.provider.email, request.POST.get("subject", ""), message):
+                        order.status = Order.STATUS_ASKED
+                        order.save()
+                    else:
+                        order.status = Order.STATUS_PENDING
+                        order.save()
+                        add_message(request, ("Email no valido. Orden no enviada", "warning"))
+                else:
+                    add_message(request, ("Proveedor: "+provider.name+" sin email. Orden no enviada", "warning"))
         if action == "RECEIVED":
             for order in Order.objects.filter(id__in=json.loads(str(request.POST.get('order_id', "[]")))):
                 order.status = Order.STATUS_RECEIVED
@@ -679,15 +835,25 @@ def shopping(request):
                 order.save()
         if action == "CANCEL":
             for order in Order.objects.filter(id__in=json.loads(str(request.POST.get('order_id', "[]")))):
-                order.status = Order.STATUS_CANCELED
-                order.save()
+                if order.provider.email:
+                    if send_email(order.provider.email, request.POST.get("subject", ""), request.POST.get("text", "")):
+                        order.status = Order.STATUS_CANCELED
+                        order.save()
+                    else:
+                        add_message(request, ("Email no valido. Email no enviado", "warning"))
+                else:
+                    add_message(request, ("Proveedor: "+order.provider.name+" sin email. Email no enviado", "warning"))
         if action == "DELETE":
             for order in Order.objects.filter(id__in=json.loads(str(request.POST.get('order_id', "[]")))):
                 for order_product in order.order_product_set.all():
                     order_product.delete()
                 order.delete()
+        return HttpResponseRedirect('/reports/shopping/')
     reports_active = "active"
     shopping_active = "active"
+    orderInputForm = OrderInputForm()
+    scripts = ["shopping"]
+    messages = get_messages(request)
     return render_to_response('pages/dashboard.html', locals(), context_instance=RequestContext(request))
 
 @login_required

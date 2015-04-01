@@ -22,6 +22,16 @@ class Classification(models.Model):
     def __unicode__(self):
         return self.name
 
+class Tool(models.Model):
+    code = models.CharField(max_length=30, primary_key=True)
+    name = models.CharField(max_length=200)
+    description = models.CharField(max_length=255, null=True, blank=True)
+    condition = models.CharField(max_length=255, null=True, blank=True)
+    amount = models.IntegerField()
+
+    def __unicode__(self):
+        return self.code+" - "+self.name+" - "+self.description
+
 class Product(models.Model):
     STORAGE_CHOICES = (
         ('C', 'Consignacion'),
@@ -35,6 +45,7 @@ class Product(models.Model):
     description = models.CharField(max_length=255, null=True, blank=True)
     appliance = models.ManyToManyField(Appliance, null=True, blank=True)
     price = models.DecimalField(max_digits=9, decimal_places=2)
+    discount = models.IntegerField()
     classification = models.ForeignKey(Classification, null=True, blank=True)
     in_used = models.IntegerField()
     in_stock = models.IntegerField()
@@ -92,11 +103,19 @@ class Lending_Product(models.Model):
     amount = models.IntegerField()
     returned_amount = models.IntegerField()
 
+class Lending_Tool(models.Model):
+    lending = models.ForeignKey(Lending)
+    tool = models.ForeignKey(Tool)
+    amount = models.IntegerField()
+    returned_amount = models.IntegerField()
+
 class Order(models.Model):
-    STATUS_ASKED = 'P'
+    STATUS_PENDING = 'P'
+    STATUS_ASKED = 'A'
     STATUS_CANCELED = 'C'
     STATUS_RECEIVED = 'R'
     STATUS_CHOICES = (
+        (STATUS_PENDING, 'Por pedir'),
         (STATUS_ASKED, 'Pedido'),
         (STATUS_CANCELED, 'Cancelado'),
         (STATUS_RECEIVED, 'Recibido'),

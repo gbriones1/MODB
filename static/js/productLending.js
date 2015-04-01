@@ -34,7 +34,7 @@ $('select#id_storage').change(function () {
 
 var $productsSelect = $('#lendingProducts');
 $('#addLendingProduct').click(function () {
-	var amount = $('#id_amount').val() || "1"
+	var amount = $('#new_lending form input[name="amount"]').val() || "1"
 	var selectedProducts = []
 	switch (selectedStorage){
 		case "C":
@@ -149,6 +149,54 @@ filterProvider.change(function (argument) {
 		$('#id_product_used option').each(function() {
             if ($(this).attr("provider") != filterProvider.val()){
 				$(this).hide();
+            }
+		});
+	}
+});
+
+
+var $toolsSelect = $('#lendingTools');
+$('#addLendingTool').click(function () {
+	var amount = $('#new_tool_lending form input[name="amount"]').val() || "1"
+	var selectedProducts = $('#id_tool option:selected');
+	if (selectedProducts.length){
+		selectedProducts.each(function(){
+			if(!$toolsSelect.find("option[value^='"+$(this).val()+"']").length){
+	            $toolsSelect.append($('<option>', {
+	                value:$(this).val()+":"+amount,
+	                text:$(this).text()+ " x "+amount
+	            }));
+	        }
+	        else{
+	            showNotification("Herramienta ya agregada", "info");
+	        }
+		});
+	}
+	else {
+		showNotification("No se ha seleccionado una Herramienta", "info");
+	}
+	return false;
+});
+
+$('#removeLendingTool').click(function () {
+    $toolsSelect.find('option:selected').remove();
+    return false;
+});
+
+$('#new_tool_lending form').submit(function () {
+	var productList = {};
+	$toolsSelect.find('option').each(function(){
+		productList[$(this).val().split(":")[0]] = $(this).val().split(":")[1];
+	});
+	$('#new_tool_lending form input[name="lendingTools"]').val(JSON.stringify(productList));
+});
+var toolFilterSearch = $('#id_tool_filter_search');
+toolFilterSearch.keyup(function() {
+	if ($(this).val() !== ""){
+		$('#id_tool option').each(function() {
+            var regex = new RegExp(toolFilterSearch.val(),"gi");
+            if($(this).text().match(regex) !== null){
+                $(this).prependTo($('#id_tool'));
             }
 		});
 	}

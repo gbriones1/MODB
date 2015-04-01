@@ -5,5 +5,9 @@
 {% endblock %}
 
 {% block site_wrapper %}
-{% include 'sections/productForm.html' %}
+{% if object_type == "Product" %}
+	{% include 'sections/productForm.html' %}
+{% elif object_type == "Tool" %}
+	{% include 'sections/toolForm.html' %}
+{% endif %}
 {% endblock %}

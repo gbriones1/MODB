@@ -21,6 +21,9 @@
 	{% if filter_active %}
 	{% include 'sections/productTable.html' %}
 	{% endif %}
+	{% if tools_active %}
+	{% include 'sections/toolTable.html' %}
+	{% endif %}
 	{% if inputs_active %}
 	{% include 'sections/inputTable.html' %}
 	{% endif %}

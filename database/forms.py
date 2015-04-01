@@ -3,7 +3,7 @@ from django.utils.encoding import (
     force_str, force_text, python_2_unicode_compatible,
 )
 from django.utils.html import conditional_escape, format_html
-from models import Product, Provider, Appliance, Classification, Brand, Lending, Input_Product, Output_Product, Lending_Product, Configuration
+from models import Product, Tool, Provider, Appliance, Classification, Brand, Lending, Input_Product, Output_Product, Lending_Product, Configuration
 
 from datetime import datetime
 
@@ -36,17 +36,48 @@ class ProductForm(forms.ModelForm):
     name = forms.CharField(max_length=200, label='Nombre')
     description = forms.CharField(max_length=255, label='Descripcion', required=False)
     appliance = forms.ModelMultipleChoiceField(queryset=Appliance.objects.all(), required=False, label="Aplicacion")
-    price = forms.DecimalField(max_digits=9, decimal_places=2, label='Precio', required=True)
+    price = forms.DecimalField(max_digits=9, decimal_places=2, label='Precio de lista', required=True, min_value=0, initial=0)
+    discount = forms.IntegerField(label='Descuento', initial=0, min_value=0, max_value=100)
+    real_price = forms.DecimalField(max_digits=9, decimal_places=2, label='Precio real', required=False, initial=0, min_value=0, widget=forms.widgets.NumberInput(attrs={'disabled':'disabled'}))
     classification = forms.ModelChoiceField(queryset=Classification.objects.all(), required=False, label="Porcentaje")
-    in_used = forms.IntegerField(label='Obsoletas', initial=0)
-    used_tobe = forms.IntegerField(label='Stock obsoletas', initial=0)
-    in_stock = forms.IntegerField(label='Propias', initial=0)
-    stock_tobe = forms.IntegerField(label='Stock propias', initial=0)
-    in_consignment = forms.IntegerField(label='Consignacion', initial=0)
-    consignment_tobe = forms.IntegerField(label='Stock consignacion', initial=0)
+    in_used = forms.IntegerField(label='Obsoletas', initial=0, min_value=0)
+    used_tobe = forms.IntegerField(label='Stock obsoletas', initial=0, min_value=0)
+    in_stock = forms.IntegerField(label='Propias', initial=0, min_value=0)
+    stock_tobe = forms.IntegerField(label='Stock propias', initial=0, min_value=0)
+    in_consignment = forms.IntegerField(label='Consignacion', initial=0, min_value=0)
+    consignment_tobe = forms.IntegerField(label='Stock consignacion', initial=0, min_value=0)
 
     class Meta:
         model = Product
+        # fields = "__all__"
+        fields = [
+            "code",
+            "brand",
+            "provider",
+            "name",
+            "description",
+            "appliance",
+            "price",
+            "discount",
+            "real_price",
+            "classification",
+            "in_used",
+            "used_tobe",
+            "in_stock",
+            "stock_tobe",
+            "in_consignment",
+            "consignment_tobe",
+            ] 
+
+class ToolForm(forms.ModelForm):
+    code = forms.CharField(max_length=30, label='Codigo')
+    name = forms.CharField(max_length=200, label='Nombre')
+    description = forms.CharField(max_length=255, label='Descripcion', required=False)
+    condition = forms.CharField(max_length=255, label='Condicion', required=False)
+    amount = forms.IntegerField(initial=0, label='Cantidad', required=True)
+
+    class Meta:
+        model = Tool
         fields = "__all__" 
 
 class ProductInputForm(forms.ModelForm):
@@ -91,6 +122,18 @@ class ProductLendingForm(forms.ModelForm):
     class Meta:
         model = Lending
         fields = ['date', 'employee', 'destination', 'storage', 'provider', 'filter_search', 'product_consignment', 'product_stock', 'product_used', 'amount']
+
+class ToolLendingForm(forms.ModelForm):
+    date = forms.DateField(widget=DateInput(), label='Fecha', initial=datetime.now())
+    employee = forms.CharField(max_length=100, label='Empleado')
+    destination = forms.CharField(max_length=100, label='Destino')
+    tool_filter_search = forms.CharField(max_length=100, label='Buscar herramienta')
+    tool = forms.ModelMultipleChoiceField(queryset=Tool.objects.all(), required=False, label="Seleccionar herramienta", widget=forms.widgets.Select(attrs={"size":"10"}))
+    amount = forms.IntegerField(label='Cantidad', initial=1)
+
+    class Meta:
+        model = Lending
+        fields = ['date', 'employee', 'destination', 'tool_filter_search', 'tool', 'amount']
 
 class ProviderForm(forms.ModelForm):
     name = forms.CharField(max_length=100, label='Nombre')
@@ -162,3 +205,11 @@ class ConfigurationForm(forms.ModelForm):
     class Meta:
         model = Configuration
         fields = "__all__" 
+
+class OrderInputForm(forms.ModelForm):
+    date = forms.DateField(widget=DateInput(), label='Fecha', initial=datetime.now())
+    storage = forms.ChoiceField(label='Almacen', choices=Product.STORAGE_CHOICES)
+
+    class Meta:
+        model = Input_Product
+        fields = ['date', 'storage']

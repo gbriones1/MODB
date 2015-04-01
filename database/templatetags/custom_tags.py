@@ -18,6 +18,14 @@ def substract(value, arg):
 def multiply(value, arg):
     return value * arg
 
+@register.filter(name='real_price')
+def real_price(product):
+    return product.price-product.price*product.discount/100
+
+@register.filter(name='real_price_amount')
+def real_price_amount(product, amount):
+    return amount*(product.price-product.price*product.discount/100)
+
 @register.filter(name='total_sum')
 def total_sum(movements):
     acc = 0
