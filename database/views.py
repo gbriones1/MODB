@@ -63,7 +63,6 @@ def dashboard(request):
     classifications = Classification.objects.all()
     appliances = Appliance.objects.all()
     if request.method == "POST":
-        redirect_url = "/"
         action = request.POST.get('action', '')
         if action == "CREATE":
             form = ProductForm(request.POST)
@@ -140,7 +139,11 @@ def dashboard(request):
         #             product.save()
         #     else:
         #         set_messages(request, [("Prestamo no autorizado, los datos no fueron validos", "danger")])
-        return HttpResponseRedirect("/?storage="+request.POST.get('storage', ''))
+        redirect_url = "/"
+        storage = request.POST.get('storage', '')
+        if storage:
+            redirect_url = "/?storage="+storage
+        return HttpResponseRedirect(redirect_url)
     form = ProductForm()
     storage = request.GET.get("storage", '')
     if storage == "C":
@@ -296,7 +299,27 @@ def lendings(request):
                 return_lending.returned = True
                 return_lending.returned_date = now
                 return_lending.save()
-        return HttpResponseRedirect('/lendings/')
+        elif action == "EMAIL":
+            messages = []
+            for lending in Lending.objects.filter(id__in=json.loads(str(request.POST.get('lending_id', "[]")))):
+                message = "Registro de Prestamo\n\n"
+                message += "Fecha: "+lending.date.strftime("%Y-%m-%d")+"\n"
+                message += "Empleado: "+lending.employee+"\n"
+                message += "Destino: "+lending.destination+"\n"
+                if lending.storage:
+                    message += "Salido de: "+lending.get_storage_display()+"\n"
+                message += "\nLista de productos:\n"
+                for product_lending in lending.lending_product_set.all():
+                    product = product_lending.product
+                    message += product.code+" - "+product.name+" - "+product.description+". Cantidad: x"+str(product_lending.amount)+"\n"
+                for tool_lending in lending.lending_tool_set.all():
+                    tool = tool_lending.tool
+                    message += tool.code+" - "+tool.name+" - "+tool.description+". Cantidad: x"+str(tool_lending.amount)+"\n"
+                conf = Configuration.objects.all()[0]
+                if not conf.receiver_email or not send_email(conf.receiver_email, "Registro de prestamo", message):
+                    messages.append(("Correo de registro de prestamo no enviado, correo no valido", "warning"))
+            set_messages(request, messages)
+        return HttpResponseRedirect('/lendings/?start_date='+formatted_start_date+"&end_date="+formatted_end_date)
     form = ProductLendingForm()
     toolForm = ToolLendingForm()
     scripts = ['productLending']
@@ -329,13 +352,15 @@ def inputs(request):
             if product_amount and storage:
                 is_valid = True
                 messages = []
+                pdb.set_trace()
                 for productId, definition in product_amount.iteritems():
                     amount = definition["amount"]
                     price = float(definition["price"])
                     product = Product.objects.get(code=productId)
-                    if float(product.price-product.price*product.discount/100) != price:
+                    product_real_price = float(product.price-product.price*product.discount/100)
+                    if product_real_price != price:
                         is_valid = False
-                        messages.append(("El producto "+product.code+" - "+product.name+" a: $"+str(product.price)+" no coincide con el precio ingresado: $"+str(price), "danger"))
+                        messages.append(("El producto "+product.code+" - "+product.name+" a: $"+str(product_real_price)+" no coincide con el precio ingresado: $"+str(price), "danger"))
                 if is_valid:
                     new_input = Input(storage=storage, date=date)
                     new_input.save()
@@ -373,7 +398,7 @@ def inputs(request):
                         product.save()
                     product_input.delete()
                 delete_input.delete()
-        return HttpResponseRedirect('/inputs/')
+        return HttpResponseRedirect('/inputs/?start_date='+formatted_start_date+"&end_date="+formatted_end_date)
     form = ProductInputForm()
     scripts = ['productInput']
     messages = get_messages(request)
@@ -446,7 +471,21 @@ def outputs(request):
                         product.save()
                     product_output.delete()
                 delete_output.delete()
-        return HttpResponseRedirect('/outputs/')
+        elif action == "EMAIL":
+            messages = []
+            for output in Output.objects.filter(id__in=json.loads(str(request.POST.get('output_id', "[]")))):
+                message = "Registro de Salida\n\n"
+                message += "Fecha: "+output.date.strftime("%Y-%m-%d")+"\n"
+                message += "Salido de: "+output.get_storage_display()+"\n"
+                message += "\nLista de productos:\n"
+                for product_output in output.output_product_set.all():
+                    product = product_output.product
+                    message += product.code+" - "+product.name+" - "+product.description+". Cantidad: x"+str(product_output.amount)+"\n"
+                conf = Configuration.objects.all()[0]
+                if not conf.receiver_email or not send_email(conf.receiver_email, "Registro de salida", message):
+                    messages.append(("Correo de registro de salida no enviado, correo no valido", "warning"))
+            set_messages(request, messages)
+        return HttpResponseRedirect('/outputs/?start_date='+formatted_start_date+"&end_date="+formatted_end_date)
     form = ProductOutputForm()
     scripts = ['productOutput']
     messages = get_messages(request)
@@ -848,7 +887,7 @@ def shopping(request):
                 for order_product in order.order_product_set.all():
                     order_product.delete()
                 order.delete()
-        return HttpResponseRedirect('/reports/shopping/')
+        return HttpResponseRedirect('/reports/shopping/?start_date='+formatted_start_date+"&end_date="+formatted_end_date)
     reports_active = "active"
     shopping_active = "active"
     orderInputForm = OrderInputForm()

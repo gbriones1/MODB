@@ -122,7 +122,7 @@ $('input[name="price"]').change(function () {
 function calculateRealPrice (form) {
 	var discount = form.find("input[name=discount]").val();
 	var price = form.find('#id_price').val();
-	form.find('#id_real_price').val(price-price*discount/100);
+	form.find('#id_real_price').val((price-price*discount/100).toFixed(2));
 }
 
 function getProductName (code) {
@@ -183,7 +183,13 @@ $(".multi-select-filter").change(function () {
 
 $(document).on('click', 'button.edit-modal', function () {
     $('.edit-iframe').attr('data-id', $(this).attr('data-id'));
-    $('.edit-iframe').attr('src', '/product/'+$(this).attr('data-id')+'/?storage='+$('#new input[name="storage"]').val());
+    var storage = $('#new input[name="storage"]').val();
+    if (storage){
+    	$('.edit-iframe').attr('src', '/product/'+$(this).attr('data-id')+'/?storage='+storage);
+    }
+    else{
+    	$('.edit-iframe').attr('src', '/product/'+$(this).attr('data-id'));
+    }
 });
 
 $(document).on('click', '#edit button[type="submit"]', function (argument) {
@@ -234,5 +240,5 @@ $('.edit-iframe').load(function () {
 });
 
 $(document).on('click', 'button.delete-modal', function () {
-    $('#single-delete input[name="code"]').val('["'+$(this).attr('data-id')+'""]');
+    $('#single-delete input[name="code"]').val('["'+$(this).attr('data-id')+'"]');
 });

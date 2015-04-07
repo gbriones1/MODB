@@ -48,7 +48,7 @@
                     <td>Entrada</td>
                     <td>
                         <table class="table table-bordred table-striped table-hover table-condensed">
-                            <thead><tr><th>Codigo</th><th>Nombre</th><th>Cantidad</th></tr></thead>
+                            <thead><tr><th>Código</th><th>Nombre</th><th>Cantidad</th></tr></thead>
                             <tbody>
                             {% for product in reg.input_product_set.all %}
                             <tr><td>{{ product.product.code }}</td><td>{{ product.product.name }}</td><td>{{ product.amount }}</td></tr>
@@ -60,7 +60,7 @@
                     <td>Salida</td>
                     <td>
                         <table class="table table-bordred table-striped table-hover table-condensed">
-                            <thead><tr><th>Codigo</th><th>Nombre</th><th>Cantidad</th></tr></thead>
+                            <thead><tr><th>Código</th><th>Nombre</th><th>Cantidad</th></tr></thead>
                             <tbody>
                             {% for product in reg.output_product_set.all %}
                             <tr><td>{{ product.product.code }}</td><td>{{ product.product.name }}</td><td>{{ product.amount }}</td></tr>
@@ -72,7 +72,7 @@
                     <td>Prestamo</td>
                     <td>
                         <table class="table table-bordred table-striped table-hover table-condensed">
-                            <thead><tr><th>Codigo</th><th>Nombre</th><th>Cantidad</th></tr></thead>
+                            <thead><tr><th>Código</th><th>Nombre</th><th>Cantidad</th></tr></thead>
                             <tbody>
                             {% for product in reg.lending_product_set.all %}
                             <tr><td>{{ product.product.code }}</td><td>{{ product.product.name }}</td><td>{{ product.amount }}</td></tr>

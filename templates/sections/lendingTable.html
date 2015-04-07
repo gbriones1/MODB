@@ -46,6 +46,7 @@
                 <th>Productos</th>
                 <th style="text-align: center;">Devuelto</th>
                 <th>Fecha devuelto</th>
+                <th style="text-align: center;">Enviar</th>
                 <th style="text-align: center;">Eliminar</th>
             </thead>
             <tbody>
@@ -57,7 +58,7 @@
                     <td>{{ lending.destination }}</td>
                     <td>{{ lending.get_storage_display }}</td>
                     <td><table class="table table-bordred table-striped table-hover table-condensed">
-                        <tr><th>Codigo</th><th>Nombre</th><th>Pestados</th><th>Devueltos</th></tr>
+                        <tr><th>Código</th><th>Nombre</th><th>Pestados</th><th>Devueltos</th></tr>
                         {% for product in lending.lending_product_set.all %}
                         <tr><td>{{ product.product.code }}</td><td>{{ product.product.name }}</td><td>{{ product.amount }}</td><td>{{ product.returned_amount }}</td></tr>
                         {% endfor %} 
@@ -71,7 +72,8 @@
                     <td align="center"><p data-placement="top" data-toggle="tooltip" title="Devolver al almacen"><button class="btn btn-warning" data-title="Return" data-toggle="modal" data-target="#return{{ lending.id }}" ><i class="fa fa-times"></i></button></p></td>
                     {% endif %}
                     <td>{% if lending.returned_date %}{{ lending.returned_date.day }}-{{ lending.returned_date.month|month_name }}-{{ lending.returned_date.year }}{% endif %}</td>
-                    <td align="center"><p data-placement="top" data-toggle="tooltip" title="Eliminar esta entrada"><button class="btn btn-danger" data-title="Delete" data-toggle="modal" data-target="#delete{{ lending.id }}" ><span class="glyphicon glyphicon-trash"></span></button></p></td>
+                    <td align="center"><p data-placement="top" data-toggle="tooltip" title="Enviar este prestamo"><button class="btn btn-info" data-title="Delete" data-toggle="modal" data-target="#email{{ lending.id }}" ><i class="fa fa-envelope"></i></button></p></td>
+                    <td align="center"><p data-placement="top" data-toggle="tooltip" title="Eliminar este prestamo"><button class="btn btn-danger" data-title="Delete" data-toggle="modal" data-target="#delete{{ lending.id }}" ><span class="glyphicon glyphicon-trash"></span></button></p></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -208,6 +210,28 @@
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-danger btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Eliminar</button>
+                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fad" id="email{{ lending.id }}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+                <h4 class="modal-title custom_align" id="Heading">Enviar prestamo de {{ lending.date }}</h4>
+            </div>
+            <form class="form-horizontal" action="" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="lending_id" value='["{{ lending.id }}"]'>
+                <input type="hidden" name="action" value="EMAIL">
+                <div class="modal-body">
+                    <div class="alert alert-info"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de enviar este Prestamo por email?</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-info btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Enviar</button>
                     <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
                 </div>
             </form>

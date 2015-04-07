@@ -30,7 +30,7 @@ with open('seedDB.csv', 'rb') as csvfile:
             tobe = int(row['tobe'].strip()) if row['tobe'].strip() else 0
             if code in codes:
                 assignment = ''
-                if storage == "CONSIGNACION":
+                if storage == "Consignación":
                     assignment = 'in_consignment='+str(amount)+', consignment_tobe='+str(tobe)
                 elif storage == "PROPIO":
                     assignment = 'in_stock='+str(amount)+', stock_tobe='+str(tobe)
@@ -49,7 +49,7 @@ with open('seedDB.csv', 'rb') as csvfile:
                 classification_id = get_object_id(row['classification'].strip(), classifications, "classification")
                 fields = '(`code`, `name`, `description`, `price`, `provider_id`, `classification_id`, `brand_id`, `in_consignment`, `in_stock`, `in_used`, `consignment_tobe`, `stock_tobe`, `used_tobe`)'
                 values = '("'+code+'", "'+name+'", "'+description+'", 0, '+str(provider_id)+', '+str(classification_id)+', '+str(brand_id)+', '
-                if storage == "CONSIGNACION":
+                if storage == "Consignación":
                     values += str(amount)+', 0, 0, '+str(tobe)+', 0, 0'
                 elif storage == "PROPIO":
                     values += '0, '+str(amount)+', 0, 0, '+str(tobe)+', 0'

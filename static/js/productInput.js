@@ -107,5 +107,5 @@ function calculatePrice () {
 	if (discount == -1){
 		discount = $('#id_custom_discount').val();
 	}
-	$('#id_real_price').val($('#id_price').val()-$('#id_price').val()*discount/100)
+	$('#id_real_price').val(($('#id_price').val()-$('#id_price').val()*discount/100).toFixed(2))
 }

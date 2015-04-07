@@ -16,7 +16,7 @@ $('.product-input').each(function () {
 function calculateRealPrice (section) {
 	var discount = section.find(".discount").val();
 	var price = section.find('.price').val();
-	section.find('.real_price').val(price-price*discount/100);
+	section.find('.real_price').val((price-price*discount/100).toFixed(2));
 }
 
 $(document).on('click', '.unlist-product', function (){

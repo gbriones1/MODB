@@ -19,69 +19,10 @@
                     <div class="table-responsive">
                         <table class="table table-bordred table-striped table-hover">
                             <thead>
-                                <th>
-                                    <div class="btn-group btn-input clearfix filter-btn">
-                                      <button type="button" class="btn btn-default dropdown-toggle btn-block form-control" data-toggle="dropdown" aria-expanded="false"> Codigo <span class="caret"></span>
-                                      </button>
-                                      <ul class="dropdown-menu" role="menu">
-                                        <li role="presentation" class="dropdown-header">Ordenar</li>
-                                        <li><a href="/?sort=code">Ascendente</a></li>
-                                        <li><a href="/?sort=code&order=desc">Descendente</a></li>
-                                        <li class="divider"></li>
-                                        <li role="presentation" class="dropdown-header">Filtrar</li>
-                                        <li class="filter-menu"><input type="text" class="input-filter form-control" data-field="code"></li>
-                                      </ul>
-                                    </div>
-                                </th>
-                                <th>
-                                    <div class="btn-group btn-input clearfix filter-btn">
-                                      <button type="button" class="btn btn-default dropdown-toggle btn-block form-control" data-toggle="dropdown" aria-expanded="false"> Marca <span class="caret"></span>
-                                      </button>
-                                      <ul class="dropdown-menu" role="menu">
-                                        <li role="presentation" class="dropdown-header">Ordenar</li>
-                                        <li><a href="/?sort=model">Ascendente</a></li>
-                                        <li><a href="/?sort=model&order=desc">Descendente</a></li>
-                                        <li class="divider"></li>
-                                        <li role="presentation" class="dropdown-header">Filtrar</li>
-                                        <li class="filter-menu">
-                                            <select type="text" class="select-filter form-control" data-field="model">
-                                                <option value=""></option>
-                                                {% for model in models %}
-                                                    <option value="{{ model.id }}">{{ model.name }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </li>
-                                      </ul>
-                                    </div>
-                                </th>
-                                <th>
-                                    <div class="btn-group btn-input clearfix filter-btn">
-                                      <button type="button" class="btn btn-default dropdown-toggle btn-block form-control" data-toggle="dropdown" aria-expanded="false"> Nombre <span class="caret"></span>
-                                      </button>
-                                      <ul class="dropdown-menu" role="menu">
-                                        <li role="presentation" class="dropdown-header">Ordenar</li>
-                                        <li><a href="/?sort=name">Ascendente</a></li>
-                                        <li><a href="/?sort=name&order=desc">Descendente</a></li>
-                                        <li class="divider"></li>
-                                        <li role="presentation" class="dropdown-header">Filtrar</li>
-                                        <li class="filter-menu"><input type="text" class="input-filter form-control" data-field="name"></li>
-                                      </ul>
-                                    </div>
-                                </th>
-                                <th>
-                                    <div class="btn-group btn-input clearfix filter-btn">
-                                      <button type="button" class="btn btn-default dropdown-toggle btn-block form-control" data-toggle="dropdown" aria-expanded="false"> Descripcion <span class="caret"></span>
-                                      </button>
-                                      <ul class="dropdown-menu" role="menu">
-                                        <li role="presentation" class="dropdown-header">Ordenar</li>
-                                        <li><a href="/?sort=description">Ascendente</a></li>
-                                        <li><a href="/?sort=description&order=desc">Descendente</a></li>
-                                        <li class="divider"></li>
-                                        <li role="presentation" class="dropdown-header">Filtrar</li>
-                                        <li class="filter-menu"><input type="text" class="input-filter form-control" data-field="description"></li>
-                                      </ul>
-                                    </div>
-                                </th>
+                                <th>Código</th>
+                                <th>Marca</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
                                 <th>Cantidades</th>
                             </thead>
                             <tbody>
@@ -94,7 +35,7 @@
                                     <td><table class="table table-bordred table-striped table-hover table-condensed">
                                         <thead><tr><th>Almacen</th><th>Existentes</th><th>Necesitadas</th><th>Faltantes</th></tr></thead>
                                         <tbody>
-                                        <tr><th>Consignacion</th><td>{{ product.in_consignment }}</td><td>{{ product.consignment_tobe }}</td><td class="consignment-needed">{{ product.consignment_tobe|substract:product.in_consignment }}</td></tr>
+                                        <tr><th>Consignación</th><td>{{ product.in_consignment }}</td><td>{{ product.consignment_tobe }}</td><td class="consignment-needed">{{ product.consignment_tobe|substract:product.in_consignment }}</td></tr>
                                         <tr><th>Propias</th><td>{{ product.in_stock }}</td><td>{{ product.stock_tobe }}</td><td class="stock-needed">{{ product.stock_tobe|substract:product.in_stock }}</td></tr>
                                         </tbody>
                                     </table></td>
