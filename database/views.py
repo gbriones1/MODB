@@ -65,14 +65,58 @@ def dashboard(request):
     if request.method == "POST":
         action = request.POST.get('action', '')
         if action == "CREATE":
-            form = ProductForm(request.POST)
+            data = request.POST.copy()
+            query_brand = Brand.objects.filter(name=data["brand"])
+            query_provider = Provider.objects.filter(name=data["provider"])
+            query_classification = Classification.objects.filter(name=data["classification"])
+            if query_brand:
+                data["brand"] = query_brand[0].id
+            else:
+                brand = Brand(name=data["brand"])
+                brand.save()
+                data["brand"] = brand.id
+            if query_provider:
+                data["provider"] = query_provider[0].id
+            else:
+                provider = Provider(name=data["provider"])
+                provider.save()
+                data["provider"] = provider.id
+            if query_classification:
+                data["classification"] = query_classification[0].id
+            else:
+                classification = Classification(name=data["classification"])
+                classification.save()
+                data["classification"] = classification.id
+            form = ProductForm(data)
             if form.is_valid():
                 form.save()
             else:
                 set_messages(request, [("Producto no creado, los datos no fueron validos", "danger")])
         elif action == "UPDATE":
             product = Product.objects.get(code=request.POST['code'])
-            form = ProductForm(request.POST, instance=product)
+            data = request.POST.copy()
+            query_brand = Brand.objects.filter(name=data["brand"])
+            query_provider = Provider.objects.filter(name=data["provider"])
+            query_classification = Classification.objects.filter(name=data["classification"])
+            if query_brand:
+                data["brand"] = query_brand[0].id
+            else:
+                brand = Brand(name=data["brand"])
+                brand.save()
+                data["brand"] = brand.id
+            if query_provider:
+                data["provider"] = query_provider[0].id
+            else:
+                provider = Provider(name=data["provider"])
+                provider.save()
+                data["provider"] = provider.id
+            if query_classification:
+                data["classification"] = query_classification[0].id
+            else:
+                classification = Classification(name=data["classification"])
+                classification.save()
+                data["classification"] = classification.id
+            form = ProductForm(data, instance=product)
             if form.is_valid():
                 form.save()
             else:
@@ -319,6 +363,45 @@ def lendings(request):
                 if not conf.receiver_email or not send_email(conf.receiver_email, "Registro de prestamo", message):
                     messages.append(("Correo de registro de prestamo no enviado, correo no valido", "warning"))
             set_messages(request, messages)
+        elif action == "OUTPUT":
+            messages = []
+            for output_lending in Lending.objects.filter(id__in=json.loads(str(request.POST.get('lending_id', "[]")))):
+                product_amount = {}
+                for product_lending in output_lending.lending_product_set.all():
+                    product = product_lending.product
+                    output_amount = int(request.POST["amount"+product.code])
+                    if output_amount:
+                        product_amount[product.code] = output_amount
+                storage = output_lending.storage
+                date = output_lending.date
+                if product_amount and storage:
+                    new_output = Output(storage=storage, date=date, employee=output_lending.employee, destination=output_lending.destination)
+                    new_output.save()
+                    for productId, amount in product_amount.iteritems():
+                        product = Product.objects.get(code=productId)
+                        product_output = Output_Product(product=product, amount=amount, price=product.price, output_reg=new_output)
+                        if storage == "C":
+                            product.in_consignment -= int(amount)
+                            if product.in_consignment < 0:
+                                messages.append(("El producto "+product.code+" - "+product.name+" en Consignacion ha alcanzado valores negativos, favor de corregir inconsistencias.", "warning"))
+                        elif storage == "S":
+                            product.in_stock -= int(amount)
+                            if product.in_stock < 0:
+                                messages.append(("El producto "+product.code+" - "+product.name+" en Propias ha alcanzado valores negativos, favor de corregir inconsistencias.", "warning"))
+                        elif storage == "U":
+                            product.in_used -= int(amount)
+                            if product.in_used < 0:
+                                messages.append(("El producto "+product.code+" - "+product.name+" en Obsoletas ha alcanzado valores negativos, favor de corregir inconsistencias.", "warning"))
+                        product_output.save()
+                        product.save()
+                    if messages:
+                        conf = Configuration.objects.all()[0]
+                        if conf.mailOnNegativeValues:
+                            if not conf.receiver_email or not send_email(conf.receiver_email, "BDMO Salida con valores negativos", "Salida del "+str(now)+" con inconsistencias en la base de datos:\n"+"\n".join([x[0] for x in messages])):
+                                messages.append(("Correo de notificacion de valores negativos no enviado, correo no valido", "warning"))
+                else:
+                    messages.append(("Salida no autorizada, los datos no fueron validos", "danger"))
+                set_messages(request, messages)
         return HttpResponseRedirect('/lendings/?start_date='+formatted_start_date+"&end_date="+formatted_end_date)
     form = ProductLendingForm()
     toolForm = ToolLendingForm()
@@ -429,7 +512,8 @@ def outputs(request):
             storage = request.POST.get("storage", "")
             date = datetime.strptime(request.POST.get("date", now.strftime("%Y-%m-%d")), "%Y-%m-%d").date()
             if product_amount and storage:
-                new_output = Output(storage=storage, date=date)
+                pdb.set_trace()
+                new_output = Output(storage=storage, date=date, employee=request.POST.get("employee", ""), destination=request.POST.get("destination", ""))
                 new_output.save()
                 for productId, amount in product_amount.iteritems():
                     product = Product.objects.get(code=productId)
@@ -712,18 +796,11 @@ def storage_diff(request):
         "title": "Consignacion",
         "products": []
     }
-    used_storage = {
-        "name": "used",
-        "title": "Obsoletas",
-        "products": []
-    }
     for product in Product.objects.all().order_by("code"):
         if product.in_consignment < product.consignment_tobe:
             consignment_storage["products"].append(product)
         if product.in_stock < product.stock_tobe:
             stock_storage["products"].append(product)
-        if product.in_used < product.used_tobe:
-            used_storage["products"].append(product)
     storages = [stock_storage, consignment_storage]
     scripts = ["orderStorage"]
     messages = get_messages(request)

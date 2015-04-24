@@ -50,7 +50,6 @@ class Product(models.Model):
     in_used = models.IntegerField()
     in_stock = models.IntegerField()
     in_consignment = models.IntegerField()
-    used_tobe =models.IntegerField()
     stock_tobe =models.IntegerField()
     consignment_tobe =models.IntegerField()
 
@@ -67,6 +66,8 @@ class Input(models.Model):
 
 class Output(models.Model):
     date = models.DateTimeField()
+    employee = models.CharField(max_length=100)
+    destination = models.CharField(max_length=100)
     storage = models.CharField(max_length=1, choices=Product.STORAGE_CHOICES)
 
     def __init__(self, *args, **kwargs):

@@ -89,13 +89,11 @@ $('input[name="storage"]').each(function () {
 			$(this).closest('form').find('[name="in_stock"]').closest(".form-group").hide()
 			$(this).closest('form').find('[name="stock_tobe"]').closest(".form-group").hide()
 			$(this).closest('form').find('[name="in_used"]').closest(".form-group").hide()
-			$(this).closest('form').find('[name="used_tobe"]').closest(".form-group").hide()
 			break;
 		case "S":
 			$(this).closest('form').find('[name="in_consignment"]').closest(".form-group").hide()
 			$(this).closest('form').find('[name="consignment_tobe"]').closest(".form-group").hide()
 			$(this).closest('form').find('[name="in_used"]').closest(".form-group").hide()
-			$(this).closest('form').find('[name="used_tobe"]').closest(".form-group").hide()
 			break;
 		case "U":
 			$(this).closest('form').find('[name="in_stock"]').closest(".form-group").hide()
@@ -205,13 +203,11 @@ $('.edit-iframe').load(function () {
 			$(this).contents().find('[name="in_stock"]').closest(".form-group").hide()
 			$(this).contents().find('[name="stock_tobe"]').closest(".form-group").hide()
 			$(this).contents().find('[name="in_used"]').closest(".form-group").hide()
-			$(this).contents().find('[name="used_tobe"]').closest(".form-group").hide()
 			break;
 		case "S":
 			$(this).contents().find('[name="in_consignment"]').closest(".form-group").hide()
 			$(this).contents().find('[name="consignment_tobe"]').closest(".form-group").hide()
 			$(this).contents().find('[name="in_used"]').closest(".form-group").hide()
-			$(this).contents().find('[name="used_tobe"]').closest(".form-group").hide()
 			break;
 		case "U":
 			$(this).contents().find('[name="in_stock"]').closest(".form-group").hide()

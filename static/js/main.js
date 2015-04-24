@@ -72,3 +72,5 @@ $('#update_userpass form').submit(function (argument) {
 });
 
 $('li.filter-menu').click(function(){return false});
+
+$('.table-fixed-height').height($(window).height()-230);

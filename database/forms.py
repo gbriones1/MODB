@@ -3,6 +3,11 @@ from django.utils.encoding import (
     force_str, force_text, python_2_unicode_compatible,
 )
 from django.utils.html import conditional_escape, format_html
+
+
+from django.forms.utils import flatatt
+from django.utils.safestring import mark_safe
+
 from models import Product, Tool, Provider, Appliance, Classification, Brand, Lending, Input_Product, Output_Product, Lending_Product, Configuration
 
 from datetime import datetime
@@ -28,20 +33,48 @@ class ProductSelect(forms.widgets.Select):
                            selected_html,
                            force_text(option_label))
 
+class Datalist(forms.widgets.Select):
+    def render(self, name, value, attrs=None, choices=()):
+        if value is None:
+            value = ''
+        datalist_attrs = attrs
+        final_attrs = self.build_attrs(attrs, name=name)
+        final_attrs["list"] = final_attrs.pop("id")
+        if value != '':
+            if name == "brand":
+                final_attrs["value"] = Brand.objects.get(id=value).name
+            elif name == "provider":
+                final_attrs["value"] = Provider.objects.get(id=value).name
+            elif name == "classification":
+                final_attrs["value"] = Classification.objects.get(id=value).name
+        output = [format_html('<input{} />', flatatt(final_attrs)), format_html('<datalist{}>', flatatt(datalist_attrs))]
+        options = self.render_options(choices, [value])
+        if options:
+            output.append(options)
+        output.append('</datalist>')
+        return mark_safe('\n'.join(output))
+
+    def render_option(self, selected_choices, option_value, option_label):
+        if option_value is None:
+            option_value = ''
+        if option_value == "":
+            option_label = ""
+        option_value = force_text(option_value)
+        return format_html('<option value="{}"></option>',
+                           force_text(option_label))
 
 class ProductForm(forms.ModelForm):
     code = forms.CharField(max_length=30, label='Codigo')
-    brand = forms.ModelChoiceField(queryset=Brand.objects.all(), required=False, label="Marca")
-    provider = forms.ModelChoiceField(queryset=Provider.objects.all(), required=False, label="Proveedor")
+    brand = forms.ModelChoiceField(queryset=Brand.objects.all(), required=False, label="Marca", widget=Datalist())
+    provider = forms.ModelChoiceField(queryset=Provider.objects.all(), required=False, label="Proveedor", widget=Datalist())
     name = forms.CharField(max_length=200, label='Nombre')
     description = forms.CharField(max_length=255, label='Descripcion', required=False)
     appliance = forms.ModelMultipleChoiceField(queryset=Appliance.objects.all(), required=False, label="Aplicacion")
     price = forms.DecimalField(max_digits=9, decimal_places=2, label='Precio de lista', required=True, min_value=0, initial=0)
     discount = forms.IntegerField(label='Descuento', initial=0, min_value=0, max_value=100)
     real_price = forms.DecimalField(max_digits=9, decimal_places=2, label='Precio real', required=False, initial=0, min_value=0, widget=forms.widgets.NumberInput(attrs={'disabled':'disabled'}))
-    classification = forms.ModelChoiceField(queryset=Classification.objects.all(), required=False, label="Porcentaje")
+    classification = forms.ModelChoiceField(queryset=Classification.objects.all(), required=False, label="Porcentaje", widget=Datalist())
     in_used = forms.IntegerField(label='Obsoletas', initial=0, min_value=0)
-    used_tobe = forms.IntegerField(label='Stock obsoletas', initial=0, min_value=0)
     in_stock = forms.IntegerField(label='Propias', initial=0, min_value=0)
     stock_tobe = forms.IntegerField(label='Stock propias', initial=0, min_value=0)
     in_consignment = forms.IntegerField(label='Consignacion', initial=0, min_value=0)
@@ -49,7 +82,6 @@ class ProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        # fields = "__all__"
         fields = [
             "code",
             "brand",
@@ -62,7 +94,6 @@ class ProductForm(forms.ModelForm):
             "real_price",
             "classification",
             "in_used",
-            "used_tobe",
             "in_stock",
             "stock_tobe",
             "in_consignment",
@@ -95,6 +126,8 @@ class ProductInputForm(forms.ModelForm):
 
 class ProductOutputForm(forms.ModelForm):
     date = forms.DateField(widget=DateInput(), label='Fecha', initial=datetime.now())
+    employee = forms.CharField(max_length=100, label='Empleado')
+    destination = forms.CharField(max_length=100, label='Destino')
     filter_search = forms.CharField(max_length=100, label='Buscar producto')
     product_consignment = forms.ModelMultipleChoiceField(queryset=Product.objects.filter(in_consignment__gt=0), required=False, label="Seleccionar productos", widget=ProductSelect(attrs={"size":"10"}))
     product_stock = forms.ModelMultipleChoiceField(queryset=Product.objects.filter(in_stock__gt=0), required=False, label="Seleccionar productos", widget=ProductSelect(attrs={"size":"10"}))
@@ -105,7 +138,7 @@ class ProductOutputForm(forms.ModelForm):
 
     class Meta:
         model = Output_Product
-        fields = ['date', 'storage', 'provider', 'filter_search', 'product_consignment', 'product_stock', 'product_used', 'amount']
+        fields = ['date', 'employee', 'destination', 'storage', 'provider', 'filter_search', 'product_consignment', 'product_stock', 'product_used', 'amount']
 
 class ProductLendingForm(forms.ModelForm):
     date = forms.DateField(widget=DateInput(), label='Fecha', initial=datetime.now())

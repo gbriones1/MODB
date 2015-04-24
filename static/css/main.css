@@ -41,7 +41,18 @@ footer p {
 	display: none;
 }
 
+.table-responsive {
+	min-height: 210px;
+	margin-bottom: 50px;
+	max-height: 600px;
+}
+
 @media (min-width: 768px){
+	.main {
+		padding-right: 40px;
+		padding-left: 40px;
+	}
+
 	.sidebar{
 		position: fixed;
 		top: 51px;
@@ -57,6 +68,8 @@ footer p {
 		margin-bottom: 50px;
 	}
 }
+
+
 .nav-sidebar > .active > a, .nav-sidebar > .active > a:hover, .nav-sidebar > .active > a:focus {
 	color: #fff;
 	background-color: #428bca;
@@ -74,13 +87,6 @@ footer p {
 
 .main {
 	padding: 20px;
-}
-
-@media (min-width: 768px){
-	.main {
-		padding-right: 40px;
-		padding-left: 40px;
-	}
 }
 
 .action-btn {
@@ -110,9 +116,6 @@ footer p {
 	display: block;
 }
 
-.table-responsive {
-	min-height: 210px;
-}
 
 iframe {
 	width: 100%;
