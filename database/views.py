@@ -435,7 +435,6 @@ def inputs(request):
             if product_amount and storage:
                 is_valid = True
                 messages = []
-                pdb.set_trace()
                 for productId, definition in product_amount.iteritems():
                     amount = definition["amount"]
                     price = float(definition["price"])
@@ -512,7 +511,6 @@ def outputs(request):
             storage = request.POST.get("storage", "")
             date = datetime.strptime(request.POST.get("date", now.strftime("%Y-%m-%d")), "%Y-%m-%d").date()
             if product_amount and storage:
-                pdb.set_trace()
                 new_output = Output(storage=storage, date=date, employee=request.POST.get("employee", ""), destination=request.POST.get("destination", ""))
                 new_output.save()
                 for productId, amount in product_amount.iteritems():
