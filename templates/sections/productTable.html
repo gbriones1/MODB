@@ -39,8 +39,8 @@
                       </button>
                       <ul class="dropdown-menu" role="menu">
                         <li role="presentation" class="dropdown-header">Ordenar</li>
-                        <li><a href="/?sort=code">Ascendente</a></li>
-                        <li><a href="/?sort=code&order=desc">Descendente</a></li>
+                        <li><a href="/?sort=code{% if storage %}&storage={{ storage }}{% endif %}">Ascendente</a></li>
+                        <li><a href="/?sort=code&order=desc{% if storage %}&storage={{ storage }}{% endif %}">Descendente</a></li>
                         <li class="divider"></li>
                         <li role="presentation" class="dropdown-header">Filtrar</li>
                         <li class="filter-menu"><input type="text" class="input-filter form-control" data-field="code"></li>
@@ -54,8 +54,8 @@
                       </button>
                       <ul class="dropdown-menu" role="menu">
                         <li role="presentation" class="dropdown-header">Ordenar</li>
-                        <li><a href="/?sort=brand">Ascendente</a></li>
-                        <li><a href="/?sort=brand&order=desc">Descendente</a></li>
+                        <li><a href="/?sort=brand{% if storage %}&storage={{ storage }}{% endif %}">Ascendente</a></li>
+                        <li><a href="/?sort=brand&order=desc{% if storage %}&storage={{ storage }}{% endif %}">Descendente</a></li>
                         <li class="divider"></li>
                         <li role="presentation" class="dropdown-header">Filtrar</li>
                         <li class="filter-menu">
@@ -76,8 +76,8 @@
                       </button>
                       <ul class="dropdown-menu" role="menu">
                         <li role="presentation" class="dropdown-header">Ordenar</li>
-                        <li><a href="/?sort=provider">Ascendente</a></li>
-                        <li><a href="/?sort=provider&order=desc">Descendente</a></li>
+                        <li><a href="/?sort=provider{% if storage %}&storage={{ storage }}{% endif %}">Ascendente</a></li>
+                        <li><a href="/?sort=provider&order=desc{% if storage %}&storage={{ storage }}{% endif %}">Descendente</a></li>
                         <li class="divider"></li>
                         <li role="presentation" class="dropdown-header">Filtrar</li>
                         <li class="filter-menu">
@@ -98,8 +98,8 @@
                       </button>
                       <ul class="dropdown-menu" role="menu">
                         <li role="presentation" class="dropdown-header">Ordenar</li>
-                        <li><a href="/?sort=name">Ascendente</a></li>
-                        <li><a href="/?sort=name&order=desc">Descendente</a></li>
+                        <li><a href="/?sort=name{% if storage %}&storage={{ storage }}{% endif %}">Ascendente</a></li>
+                        <li><a href="/?sort=name&order=desc{% if storage %}&storage={{ storage }}{% endif %}">Descendente</a></li>
                         <li class="divider"></li>
                         <li role="presentation" class="dropdown-header">Filtrar</li>
                         <li class="filter-menu"><input type="text" class="input-filter form-control" data-field="name"></li>
@@ -113,8 +113,8 @@
                       </button>
                       <ul class="dropdown-menu" role="menu">
                         <li role="presentation" class="dropdown-header">Ordenar</li>
-                        <li><a href="/?sort=description">Ascendente</a></li>
-                        <li><a href="/?sort=description&order=desc">Descendente</a></li>
+                        <li><a href="/?sort=description{% if storage %}&storage={{ storage }}{% endif %}">Ascendente</a></li>
+                        <li><a href="/?sort=description&order=desc{% if storage %}&storage={{ storage }}{% endif %}">Descendente</a></li>
                         <li class="divider"></li>
                         <li role="presentation" class="dropdown-header">Filtrar</li>
                         <li class="filter-menu"><input type="text" class="input-filter form-control" data-field="description"></li>
@@ -146,8 +146,8 @@
                       </button>
                       <ul class="dropdown-menu" role="menu">
                         <li role="presentation" class="dropdown-header">Ordenar</li>
-                        <li><a href="/?sort=price">Ascendente</a></li>
-                        <li><a href="/?sort=price&order=desc">Descendente</a></li>
+                        <li><a href="/?sort=price{% if storage %}&storage={{ storage }}{% endif %}">Ascendente</a></li>
+                        <li><a href="/?sort=price&order=desc{% if storage %}&storage={{ storage }}{% endif %}">Descendente</a></li>
                         <li class="divider"></li>
                         <li role="presentation" class="dropdown-header">Filtrar</li>
                         <li class="filter-menu"><input type="text" class="input-filter form-control" data-field="price"></li>
@@ -161,8 +161,8 @@
                       </button>
                       <ul class="dropdown-menu" role="menu">
                         <li role="presentation" class="dropdown-header">Ordenar</li>
-                        <li><a href="/?sort=classification">Ascendente</a></li>
-                        <li><a href="/?sort=classification&order=desc">Descendente</a></li>
+                        <li><a href="/?sort=classification{% if storage %}&storage={{ storage }}{% endif %}">Ascendente</a></li>
+                        <li><a href="/?sort=classification&order=desc{% if storage %}&storage={{ storage }}{% endif %}">Descendente</a></li>
                         <li class="divider"></li>
                         <li role="presentation" class="dropdown-header">Filtrar</li>
                         <li class="filter-menu">
@@ -185,20 +185,20 @@
                         {% if storage == "C" %}
                           <ul class="dropdown-menu" role="menu">
                             <li role="presentation" class="dropdown-header">Ordenar</li>
-                            <li><a href="/?storage=C&sort=in_consignment">Ascendente</a></li>
-                            <li><a href="/?storage=C&sort=in_consignment&order=desc">Descendente</a></li>
+                            <li><a href="/?storage=C&sort=in_consignment{% if storage %}&storage={{ storage }}{% endif %}">Ascendente</a></li>
+                            <li><a href="/?storage=C&sort=in_consignment&order=desc{% if storage %}&storage={{ storage }}{% endif %}">Descendente</a></li>
                           </ul>
                         {% elif storage == "S" %}
                           <ul class="dropdown-menu" role="menu">
                             <li role="presentation" class="dropdown-header">Ordenar</li>
-                            <li><a href="/?storage=S&sort=in_stock">Ascendente</a></li>
-                            <li><a href="/?storage=S&sort=in_stock&order=desc">Descendente</a></li>
+                            <li><a href="/?storage=S&sort=in_stock{% if storage %}&storage={{ storage }}{% endif %}">Ascendente</a></li>
+                            <li><a href="/?storage=S&sort=in_stock&order=desc{% if storage %}&storage={{ storage }}{% endif %}">Descendente</a></li>
                           </ul>
                         {% elif storage == "U" %}
                           <ul class="dropdown-menu" role="menu">
                             <li role="presentation" class="dropdown-header">Ordenar</li>
-                            <li><a href="/?storage=U&sort=in_used">Ascendente</a></li>
-                            <li><a href="/?storage=U&sort=in_used&order=desc">Descendente</a></li>
+                            <li><a href="/?storage=U&sort=in_used{% if storage %}&storage={{ storage }}{% endif %}">Ascendente</a></li>
+                            <li><a href="/?storage=U&sort=in_used&order=desc{% if storage %}&storage={{ storage }}{% endif %}">Descendente</a></li>
                           </ul>
                         {% elif storage %}
                         {% endif %}
@@ -212,8 +212,8 @@
                       </button>
                       <ul class="dropdown-menu" role="menu">
                         <li role="presentation" class="dropdown-header">Ordenar</li>
-                        <li><a href="/?storage=C&sort=consignment_tobe">Ascendente</a></li>
-                        <li><a href="/?storage=C&sort=consignment_tobe&order=desc">Descendente</a></li>
+                        <li><a href="/?storage=C&sort=consignment_tobe{% if storage %}&storage={{ storage }}{% endif %}">Ascendente</a></li>
+                        <li><a href="/?storage=C&sort=consignment_tobe&order=desc{% if storage %}&storage={{ storage }}{% endif %}">Descendente</a></li>
                       </ul>
                     </div>
                 </th>
@@ -225,8 +225,8 @@
                       </button>
                       <ul class="dropdown-menu" role="menu">
                         <li role="presentation" class="dropdown-header">Ordenar</li>
-                        <li><a href="/?storage=S&sort=stock_tobe">Ascendente</a></li>
-                        <li><a href="/?storage=S&sort=stock_tobe&order=desc">Descendente</a></li>
+                        <li><a href="/?storage=S&sort=stock_tobe{% if storage %}&storage={{ storage }}{% endif %}">Ascendente</a></li>
+                        <li><a href="/?storage=S&sort=stock_tobe&order=desc{% if storage %}&storage={{ storage }}{% endif %}">Descendente</a></li>
                       </ul>
                     </div>
                 </th>
