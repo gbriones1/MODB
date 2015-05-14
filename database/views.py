@@ -447,6 +447,7 @@ def inputs(request):
                     new_input = Input(storage=storage, date=date)
                     new_input.save()
                     for productId, definition in product_amount.iteritems():
+                        amount = definition["amount"]
                         product = Product.objects.get(code=productId)
                         product_input = Input_Product(product=product, amount=amount, price=float(product.price-product.price*product.discount/100), input_reg=new_input)
                         if storage == "C":
@@ -900,6 +901,7 @@ def shopping(request):
                         new_input = Input(storage=storage, date=now)
                         new_input.save()
                         for productId, definition in product_amount.iteritems():
+                            amount = definition["amount"]
                             product = Product.objects.get(code=productId)
                             product_input = Input_Product(product=product, amount=amount, price=float(product.price-product.price*product.discount/100), input_reg=new_input)
                             if storage == "C":
