@@ -208,7 +208,7 @@ def dashboard(request):
             sort = "-"+sort
         products = products.order_by(sort)
     for product in products:
-        product.real_price = product.price-product.price*product.discount/100
+        product.real_price = float("%.2f" % float(product.price-product.price*product.discount/100))
     # product_forms = {p.code:ProductForm(instance=p) for p in products}
     scripts = ["product"]
     messages = get_messages(request)
@@ -439,7 +439,7 @@ def inputs(request):
                     amount = definition["amount"]
                     price = float(definition["price"])
                     product = Product.objects.get(code=productId)
-                    product_real_price = float(product.price-product.price*product.discount/100)
+                    product_real_price = float("%.2f" % float(product.price-product.price*product.discount/100))
                     if product_real_price != price:
                         is_valid = False
                         messages.append(("El producto "+product.code+" - "+product.name+" a: $"+str(product_real_price)+" no coincide con el precio ingresado: $"+str(price), "danger"))
@@ -894,9 +894,10 @@ def shopping(request):
                         amount = definition["amount"]
                         price = float(definition["price"])
                         product = Product.objects.get(code=productId)
-                        if float(product.price-product.price*product.discount/100) != price:
+                        product_real_price = float("%.2f" % float(product.price-product.price*product.discount/100))
+                        if product_real_price != price:
                             is_valid = False
-                            messages.append(("El producto "+product.code+" - "+product.name+" a: $"+str(product.price)+" no coincide con el precio ingresado: $"+str(price), "danger"))
+                            messages.append(("El producto "+product.code+" - "+product.name+" a: $"+str(product_real_price)+" no coincide con el precio ingresado: $"+str(price), "danger"))
                     if is_valid:
                         new_input = Input(storage=storage, date=now)
                         new_input.save()
