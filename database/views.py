@@ -191,10 +191,10 @@ def dashboard(request):
     form = ProductForm()
     storage = request.GET.get("storage", '')
     if storage == "C":
-        products = products.filter(in_consignment__gt=0)
+        products = products.filter(consignment_tobe__gt=0)
         filter_active["C"] = "active"
     elif storage == "S":
-        products = products.filter(in_stock__gt=0)
+        products = products.filter(stock_tobe__gt=0)
         filter_active["S"] = "active"
     elif storage == "U":
         products = products.filter(in_used__gt=0)
