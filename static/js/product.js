@@ -238,3 +238,37 @@ $('.edit-iframe').load(function () {
 $(document).on('click', 'button.delete-modal', function () {
     $('#single-delete input[name="code"]').val('["'+$(this).attr('data-id')+'"]');
 });
+
+$('table tfoot th').each( function () {
+    var title = $('table thead th').eq( $(this).index() ).text();
+    if (title != '' && title != "Actualizar" && title != "Eliminar"){
+    	$(this).html( '<input type="text" placeholder="Buscar '+title+'" class="form-control" />' );
+    }
+    else{
+    	$(this).html( '<input style="display: none;" type="text" placeholder="Buscar '+title+'" class="form-control" />' );
+    }
+} );
+
+$('table').dataTable({
+    "sScrollY": ($(window).height()-320)+"px",
+    "sScrollX": "98%",
+    // "sScrollXInner": "150%",
+    "bScrollCollapse": true,
+    "bPaginate": false,
+    // "bFilter": false,
+    "sDom": '<"top">rt<"bottom"lp><"clear">',
+    "aoColumnDefs" : [ {
+        'bSortable' : false,
+        'aTargets' : [ 0, -1, -2 ]
+    } ],
+    "aaSorting": [[1,'asc']]
+// }).on('order.dt', function () {
+//     $('div.dataTables_scrollBody').height( $(window).height()-330);
+});
+
+$('table').DataTable().columns().every( function () {
+    var that = this;
+    $( 'input', this.footer() ).on( 'keyup change', function () {
+        that.search( this.value ).draw();
+    } );
+} );

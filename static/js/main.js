@@ -10,8 +10,8 @@ $('div.form-group input').each(function(){
 $('div.form-group select').each(function(){
 	$(this).addClass("form-control")
 });
-$("table #checkall").click(function () {
-    if ($("table #checkall").is(':checked')) {
+$(document).on('click', "table #checkall", function () {
+    if ($(this).is(':checked')) {
         $("table input[type=checkbox]").each(function () {
             $(this).prop("checked", true);
         });
@@ -73,4 +73,4 @@ $('#update_userpass form').submit(function (argument) {
 
 $('li.filter-menu').click(function(){return false});
 
-$('.table-fixed-height').height($(window).height()-230);
+$('.table-fixed-height').height($(window).height()-320);
