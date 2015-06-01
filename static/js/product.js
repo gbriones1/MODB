@@ -252,18 +252,14 @@ $('table tfoot th').each( function () {
 $('table').dataTable({
     "sScrollY": ($(window).height()-320)+"px",
     "sScrollX": "98%",
-    // "sScrollXInner": "150%",
     "bScrollCollapse": true,
     "bPaginate": false,
-    // "bFilter": false,
     "sDom": '<"top">rt<"bottom"lp><"clear">',
     "aoColumnDefs" : [ {
         'bSortable' : false,
         'aTargets' : [ 0, -1, -2 ]
     } ],
     "aaSorting": [[1,'asc']]
-// }).on('order.dt', function () {
-//     $('div.dataTables_scrollBody').height( $(window).height()-330);
 });
 
 $('table').DataTable().columns().every( function () {

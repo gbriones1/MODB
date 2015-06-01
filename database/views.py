@@ -433,36 +433,37 @@ def inputs(request):
             storage = request.POST.get("storage", "")
             date = datetime.strptime(request.POST.get("date", now.strftime("%Y-%m-%d")), "%Y-%m-%d").date()
             if product_amount and storage:
-                is_valid = True
+                updated_products = []
                 messages = []
                 for productId, definition in product_amount.iteritems():
-                    amount = definition["amount"]
                     price = float(definition["price"])
+                    discount = float(definition["discount"])
                     product = Product.objects.get(code=productId)
-                    product_real_price = float("%.2f" % float(product.price-product.price*product.discount/100))
-                    if product_real_price != price:
-                        is_valid = False
-                        messages.append(("El producto "+product.code+" - "+product.name+" a: $"+str(product_real_price)+" no coincide con el precio ingresado: $"+str(price), "danger"))
-                if is_valid:
-                    new_input = Input(storage=storage, date=date)
-                    new_input.save()
-                    for productId, definition in product_amount.iteritems():
-                        amount = definition["amount"]
-                        product = Product.objects.get(code=productId)
-                        product_input = Input_Product(product=product, amount=amount, price=float(product.price-product.price*product.discount/100), input_reg=new_input)
-                        if storage == "C":
-                            product.in_consignment += int(amount)
-                        elif storage == "S":
-                            product.in_stock += int(amount)
-                        elif storage == "U":
-                            product.in_used += int(amount)
-                        product_input.save()
+                    if float(product.price) != price or float(product.discount) != discount:
+                        product.price = price
+                        product.discount = discount
                         product.save()
-                else:
+                        updated_products.append(product.code+"-"+product.name+"-"+product.description+" a: $"+str(price)+" con "+str(discount)+"%")
+                        messages.append(("El producto "+product.code+" - "+product.name+" cambio su precio a: $"+str(price)+" y descuento del "+str(discount)+"%", "success"))
+                new_input = Input(storage=storage, date=date)
+                new_input.save()
+                for productId, definition in product_amount.iteritems():
+                    amount = definition["amount"]
+                    product = Product.objects.get(code=productId)
+                    product_input = Input_Product(product=product, amount=amount, price=float(product.price-product.price*product.discount/100), input_reg=new_input)
+                    if storage == "C":
+                        product.in_consignment += int(amount)
+                    elif storage == "S":
+                        product.in_stock += int(amount)
+                    elif storage == "U":
+                        product.in_used += int(amount)
+                    product_input.save()
+                    product.save()
+                if updated_products:
                     conf = Configuration.objects.all()[0]
                     if conf.mailOnPriceChange:
-                        if not conf.receiver_email or not send_email(conf.receiver_email, "BDMO Entrada con precios erroneos", "Entrada no autorizada del "+str(now)+" por las siguientes razones:\n"+"\n".join([x[0] for x in messages])):
-                            messages.append(("Correo de notificacion de precio diferente no enviado, correo no valido", "warning"))
+                        if not conf.receiver_email or not send_email(conf.receiver_email, "BDMO Entrada con precios cambiados", "Entrada autorizada del "+str(now)+" cambio los precios de los siguientes productos:\n"+"\n".join([x for x in updated_products])):
+                            messages.append(("Correo de notificacion de precio cambiado no enviado, correo no valido", "warning"))
                 set_messages(request, messages)
             else:
                 set_messages(request, [("Entrada no autorizada, los datos no fueron validos", "danger")])

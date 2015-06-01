@@ -64,129 +64,117 @@
     </div>
     </div>
 </div>
-<div class="modal fade" id="new_input" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                <h4 class="modal-title custom_align" id="Heading">Nueva entrada</h4>
-            </div>
-            <form class="form-horizontal" action="" autocomplete="off" method="POST" id="create">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="CREATE">
-                <input type="hidden" name="inputProducts">
-                <div class="modal-body">
-                    {% for field in form %}
-                    <div class="form-group">
-                        <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
-                        <div class="col-sm-10">{{ field }}</div>
-                    </div>
-                    {% endfor %}
-                    <div class="form-group">
-                        <label for="inputProducts" class="col-sm-2 control-label">Descuento</label>
-                        <div class="col-sm-10 btn-group" data-toggle="buttons">
-                            <label class="btn btn-primary active">
-                                <input type="radio" name="discount" id="option1" value="0" autocomplete="off" checked> 0%
-                            </label>
-                            <label class="btn btn-primary">
-                                <input type="radio" name="discount" id="option1" value="45" autocomplete="off"> 45%
-                            </label>
-                            <label class="btn btn-primary">
-                                <input type="radio" name="discount" id="option2" value="50" autocomplete="off"> 50%
-                            </label>
-                            <label class="btn btn-primary">
-                                <input type="radio" name="discount" id="option3" value="55" autocomplete="off"> 55%
-                            </label>
-                            <label class="btn btn-primary">
-                                <input type="radio" name="discount" id="option4" value="-1" autocomplete="off"> Otro
-                            </label>
-                            <label>
-                                <input type="number" name="custom_discount" id="id_custom_discount" autocomplete="off" min="1" max="100" disabled="disabled" value="50">
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputProducts" class="col-sm-2 control-label">Precio real</label>
-                        <div class="col-sm-10">
-                                <input type="number" name="real_price" id="id_real_price"value="0">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-10 col-sm-offset-2">
-                            <button type="button" id="addInputProduct" class="btn btn-info">Agregar <i class="fa fa-caret-square-o-down"></i></button>
-                            <button type="button" id="removeInputProduct" class="btn btn-info">Remover <i class="fa fa-caret-square-o-up"></i></button>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputProducts" class="col-sm-2 control-label">Productos agregados</label>
-                        <div class="col-sm-10">
-                            <select id="inputProducts" multiple></select>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-sign"></span> Registrar</button>
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
-                </div>
-            </form>
-        </div>
+<div class="modal fade" id="new_input" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true" data-focus-on="input:first" style="display: none;">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align" id="Heading">Nueva entrada</h4>
     </div>
+    <form class="form-horizontal" action="" autocomplete="off" method="POST" id="create">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="CREATE">
+        <input type="hidden" name="inputProducts">
+        <div class="modal-body">
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
+                <div class="col-sm-10">{{ field }}</div>
+            </div>
+            {% endfor %}
+            <div class="form-group">
+                <label for="inputProducts" class="col-sm-2 control-label">Descuento</label>
+                <div class="col-sm-10 btn-group" data-toggle="buttons">
+                    <label class="btn btn-primary active">
+                        <input type="radio" name="discount" id="option1" value="0" autocomplete="off" checked> 0%
+                    </label>
+                    <label class="btn btn-primary">
+                        <input type="radio" name="discount" id="option1" value="45" autocomplete="off"> 45%
+                    </label>
+                    <label class="btn btn-primary">
+                        <input type="radio" name="discount" id="option2" value="50" autocomplete="off"> 50%
+                    </label>
+                    <label class="btn btn-primary">
+                        <input type="radio" name="discount" id="option3" value="55" autocomplete="off"> 55%
+                    </label>
+                    <label class="btn btn-primary">
+                        <input type="radio" name="discount" id="option4" value="-1" autocomplete="off"> Otro
+                    </label>
+                    <label>
+                        <input type="number" name="custom_discount" id="id_custom_discount" autocomplete="off" min="1" max="100" disabled="disabled" value="50">
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputProducts" class="col-sm-2 control-label">Precio real</label>
+                <div class="col-sm-10">
+                        <input type="number" name="real_price" id="id_real_price"value="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-10 col-sm-offset-2">
+                    <button type="button" id="addInputProduct" class="btn btn-info">Agregar <i class="fa fa-caret-square-o-down"></i></button>
+                    <button type="button" id="removeInputProduct" class="btn btn-info">Remover <i class="fa fa-caret-square-o-up"></i></button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputProducts" class="col-sm-2 control-label">Productos agregados</label>
+                <div class="col-sm-10">
+                    <select id="inputProducts" multiple></select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-sign"></span> Registrar</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
 </div>
 <div class="modal fade" id="delete" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                <h4 class="modal-title custom_align" id="Heading">Borrar las entradas seleccionados</h4>
-            </div>
-            <form class="form-horizontal" action="" method="POST" id="multi-delete">
-                {% csrf_token %}
-                <input type="hidden" name="input_id" value="">
-                <input type="hidden" name="rollback" value="true">
-                <input type="hidden" name="action" value="DELETE">
-                <div class="modal-body">
-                    <div class="alert alert-danger"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de eliminar estas Entradas de la base de datos?</div>
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <div class="checkbox"><label><input type="checkbox" id="rollback" checked/> Quitar las cantidades de los productos de la Base de Datos</label></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-danger btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Eliminar</button>
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
-                </div>
-            </form>
-        </div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align" id="Heading">Borrar las entradas seleccionados</h4>
     </div>
+    <form class="form-horizontal" action="" method="POST" id="multi-delete">
+        {% csrf_token %}
+        <input type="hidden" name="input_id" value="">
+        <input type="hidden" name="rollback" value="true">
+        <input type="hidden" name="action" value="DELETE">
+        <div class="modal-body">
+            <div class="alert alert-danger"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de eliminar estas Entradas de la base de datos?</div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <div class="checkbox"><label><input type="checkbox" id="rollback" checked/> Quitar las cantidades de los productos de la Base de Datos</label></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-danger btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Eliminar</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
 </div>
 {% for input_reg in inputs %}
 <div class="modal fade" id="delete{{ input_reg.id }}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                <h4 class="modal-title custom_align" id="Heading">Borrar entrada de {{ input_reg.date }}</h4>
-            </div>
-            <form class="form-horizontal" action="" method="POST" id="single-delete">
-                {% csrf_token %}
-                <input type="hidden" name="input_id" value='["{{ input_reg.id }}"]'>
-                <input type="hidden" name="rollback" value="true">
-                <input type="hidden" name="action" value="DELETE">
-                <div class="modal-body">
-                    <div class="alert alert-danger"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de eliminar esta Entrada de la base de datos?</div>
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <div class="checkbox"><label><input type="checkbox" id="rollback" checked/> Quitar las cantidades de los productos de la Base de Datos</label></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-danger btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Eliminar</button>
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
-                </div>
-            </form>
-        </div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align" id="Heading">Borrar entrada de {{ input_reg.date }}</h4>
     </div>
+    <form class="form-horizontal" action="" method="POST" id="single-delete">
+        {% csrf_token %}
+        <input type="hidden" name="input_id" value='["{{ input_reg.id }}"]'>
+        <input type="hidden" name="rollback" value="true">
+        <input type="hidden" name="action" value="DELETE">
+        <div class="modal-body">
+            <div class="alert alert-danger"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de eliminar esta Entrada de la base de datos?</div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <div class="checkbox"><label><input type="checkbox" id="rollback" checked/> Quitar las cantidades de los productos de la Base de Datos</label></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-danger btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Eliminar</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
 </div>
 {% endfor %}

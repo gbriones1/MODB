@@ -45,7 +45,7 @@ class Product(models.Model):
     description = models.CharField(max_length=255, null=True, blank=True)
     appliance = models.ManyToManyField(Appliance, null=True, blank=True)
     price = models.DecimalField(max_digits=9, decimal_places=2)
-    discount = models.IntegerField()
+    discount = models.DecimalField(max_digits=9, decimal_places=2)
     classification = models.ForeignKey(Classification, null=True, blank=True)
     in_used = models.IntegerField()
     in_stock = models.IntegerField()

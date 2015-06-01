@@ -27,9 +27,11 @@ class ProductSelect(forms.widgets.Select):
                 selected_choices.remove(option_value)
         else:
             selected_html = ''
-        return format_html('<option value="{}" provider="{}" {}>{}</option>',
+        return format_html('<option value="{}" provider="{}" price="{}" discount="{}" {}>{}</option>',
                            option_value,
                            self.choices.queryset.get(code=option_value).provider.id,
+                           self.choices.queryset.get(code=option_value).price,
+                           self.choices.queryset.get(code=option_value).discount,
                            selected_html,
                            force_text(option_label))
 

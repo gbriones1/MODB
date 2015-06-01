@@ -43,39 +43,35 @@
 </div>
 {% for product in products %}
 <div class="modal fade" id="order{{ product.code }}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                <h4 class="modal-title custom_align">Nueva Orden</h4>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align">Nueva Orden</h4>
+    </div>
+    <form class="form-horizontal" action="" autocomplete="off" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="CREATE">
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="id_subject" class="col-sm-2 control-label">Asunto</label>
+                <input id="id_subject" class="form-control" type="text" name="subject" value="Muelles Obrero S. de R.L. de C.V.">
             </div>
-            <form class="form-horizontal" action="" autocomplete="off" method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="CREATE">
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="id_subject" class="col-sm-2 control-label">Asunto</label>
-                        <input id="id_subject" class="form-control" type="text" name="subject" value="Muelles Obrero S. de R.L. de C.V.">
-                    </div>
-                    <div class="form-group">
-                        <label for="id_text" class="col-sm-2 control-label">Mensaje</label>
+            <div class="form-group">
+                <label for="id_text" class="col-sm-2 control-label">Mensaje</label>
 <textarea id="id_text" class="form-control" rows="4" cols="50">Por medio de este mensaje les solicitamos el siguiente pedido. Favor de confirmar por esta misma via si está enderado del mismo.
 Duda o aclaración comunicarlo con almacenista a cargo.
 Gracias.</textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="{{ product.code }}" class="col-sm-9 control-label">{{ product.name }} - {{ product.description }}</label>
-                        <div class="col-sm-2">
-                            <input type="number" class="form-control" min="1" value="{{ product|total_required }}" name="{{ product.code }}" id="{{ product.code }}">
-                        </div>
-                    </div>
+            </div>
+            <div class="form-group">
+                <label for="{{ product.code }}" class="col-sm-9 control-label">{{ product.name }} - {{ product.description }}</label>
+                <div class="col-sm-2">
+                    <input type="number" class="form-control" min="1" value="{{ product|total_required }}" name="{{ product.code }}" id="{{ product.code }}">
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-sign"></span> Pedir</button>
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-sign"></span> Pedir</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
 </div>
 {% endfor %}

@@ -1,16 +1,32 @@
 var $inputProductsSelect = $('#inputProducts');
 $('#addInputProduct').click(function (argument) {
 	var amount = $('#id_amount').val() || "1"
-	var price = $('#id_real_price').val() || "1"
+	var price = $('#id_price').val() || "1"
+	var discount = getDiscount()
 	var selectedProducts = $('#id_product option:selected');
 	if (selectedProducts.length){
 		selectedProducts.each(function(){
 			if(!$inputProductsSelect.find("option[value^='"+$(this).val()+"']").length){
-	            $inputProductsSelect.append($('<option>', {
-	                value:$(this).val()+":"+amount+":"+price,
-	                text:$(this).text()+ " x "+amount+" x $"+price
-	            }));
-	            $('select#id_storage').attr('disabled', true);
+				var productOpt = $(this)
+				if ((parseFloat($(this).attr('price'))).toFixed(2) == parseFloat(price) && (parseFloat($(this).attr('discount'))).toFixed(2) == discount){
+		            $inputProductsSelect.append($('<option>', {
+		                value:productOpt.val()+":"+amount+":"+price+":"+discount,
+		                text:productOpt.text()+ " x "+amount+" x $"+price+" - "+discount+"%"
+		            }));
+		            $('select#id_storage').attr('disabled', true);
+				}
+				else{
+					$('#popup p.content').text("El producto "+$(this).text()+" no coincide con el precio de lista: $"+price+" y descuento del "+discount+"%. Desea cambiarle el precio y descuento a este producto?")
+					$('#popup').modal('show')
+					$('#popup button.ok').click(function () {
+						$inputProductsSelect.append($('<option>', {
+			                value:productOpt.val()+":"+amount+":"+price+":"+discount,
+			                text:productOpt.text()+ " x "+amount+" x $"+price+" - "+discount+"%"
+			            }));
+			            $('select#id_storage').attr('disabled', true);
+			            $('#popup button.ok').off();
+					})
+				}
 	        }
 	        else{
 	            showNotification("Producto ya agregado", "info");
@@ -35,7 +51,7 @@ $('#new_input form').submit(function () {
 	$('select#id_storage').removeAttr('disabled');
 	var productList = {};
 	$inputProductsSelect.find('option').each(function(){
-		productList[$(this).val().split(":")[0]] = {amount: $(this).val().split(":")[1], price:$(this).val().split(":")[2]};
+		productList[$(this).val().split(":")[0]] = {amount: $(this).val().split(":")[1], price:$(this).val().split(":")[2], discount:$(this).val().split(":")[3]};
 	});
 	$('#new_input form input[name="inputProducts"]').val(JSON.stringify(productList));
 });
@@ -103,9 +119,13 @@ $("input[name=discount]:radio").change(function () {
 });
 
 function calculatePrice () {
+	$('#id_real_price').val(($('#id_price').val()-$('#id_price').val()*getDiscount()/100).toFixed(2))
+}
+
+function getDiscount () {
 	var discount = $("input[name=discount]:checked").val();
 	if (discount == -1){
 		discount = $('#id_custom_discount').val();
 	}
-	$('#id_real_price').val(($('#id_price').val()-$('#id_price').val()*discount/100).toFixed(2))
+	return parseFloat(discount)
 }

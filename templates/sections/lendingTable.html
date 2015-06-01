@@ -88,234 +88,206 @@
     </div>
 </div>
 <div class="modal fade" id="new_lending" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                <h4 class="modal-title custom_align" id="Heading">Nuevo prestamo</h4>
-            </div>
-            <form class="form-horizontal" action="" autocomplete="off" method="POST" id="create">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="CREATE">
-                <input type="hidden" name="lendingProducts">
-                <div class="modal-body">
-                    {% for field in form %}
-                    <div class="form-group">
-                        <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
-                        <div class="col-sm-10">{{ field }}</div>
-                    </div>
-                    {% endfor %}
-                    <div class="form-group">
-                        <div class="col-sm-10 col-sm-offset-2">
-                            <button type="button" id="addLendingProduct" class="btn btn-info">Agregar <i class="fa fa-caret-square-o-down"></i></button>
-                            <button type="button" id="removeLendingProduct" class="btn btn-info">Remover <i class="fa fa-caret-square-o-up"></i></button>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="lendingProducts" class="col-sm-2 control-label">Productos agregados</label>
-                        <div class="col-sm-10">
-                            <select id="lendingProducts" multiple></select>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-sign"></span> Prestar</button>
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
-                </div>
-            </form>
-        </div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align" id="Heading">Nuevo prestamo</h4>
     </div>
+    <form class="form-horizontal" action="" autocomplete="off" method="POST" id="create">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="CREATE">
+        <input type="hidden" name="lendingProducts">
+        <div class="modal-body">
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
+                <div class="col-sm-10">{{ field }}</div>
+            </div>
+            {% endfor %}
+            <div class="form-group">
+                <div class="col-sm-10 col-sm-offset-2">
+                    <button type="button" id="addLendingProduct" class="btn btn-info">Agregar <i class="fa fa-caret-square-o-down"></i></button>
+                    <button type="button" id="removeLendingProduct" class="btn btn-info">Remover <i class="fa fa-caret-square-o-up"></i></button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="lendingProducts" class="col-sm-2 control-label">Productos agregados</label>
+                <div class="col-sm-10">
+                    <select id="lendingProducts" multiple></select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-sign"></span> Prestar</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
 </div>
 <div class="modal fade" id="new_tool_lending" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                <h4 class="modal-title custom_align" id="Heading">Nuevo prestamo</h4>
-            </div>
-            <form class="form-horizontal" action="" autocomplete="off" method="POST" id="create">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="CREATE">
-                <input type="hidden" name="lendingTools">
-                <div class="modal-body">
-                    {% for field in toolForm %}
-                    <div class="form-group">
-                        <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
-                        <div class="col-sm-10">{{ field }}</div>
-                    </div>
-                    {% endfor %}
-                    <div class="form-group">
-                        <div class="col-sm-10 col-sm-offset-2">
-                            <button type="button" id="addLendingTool" class="btn btn-info">Agregar <i class="fa fa-caret-square-o-down"></i></button>
-                            <button type="button" id="removeLendingTool" class="btn btn-info">Remover <i class="fa fa-caret-square-o-up"></i></button>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="lendingTools" class="col-sm-2 control-label">Herramientas agregadas</label>
-                        <div class="col-sm-10">
-                            <select id="lendingTools" multiple></select>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-sign"></span> Prestar</button>
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
-                </div>
-            </form>
-        </div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align" id="Heading">Nuevo prestamo</h4>
     </div>
+    <form class="form-horizontal" action="" autocomplete="off" method="POST" id="create">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="CREATE">
+        <input type="hidden" name="lendingTools">
+        <div class="modal-body">
+            {% for field in toolForm %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
+                <div class="col-sm-10">{{ field }}</div>
+            </div>
+            {% endfor %}
+            <div class="form-group">
+                <div class="col-sm-10 col-sm-offset-2">
+                    <button type="button" id="addLendingTool" class="btn btn-info">Agregar <i class="fa fa-caret-square-o-down"></i></button>
+                    <button type="button" id="removeLendingTool" class="btn btn-info">Remover <i class="fa fa-caret-square-o-up"></i></button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="lendingTools" class="col-sm-2 control-label">Herramientas agregadas</label>
+                <div class="col-sm-10">
+                    <select id="lendingTools" multiple></select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-sign"></span> Prestar</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
 </div>
 <div class="modal fade" id="delete" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                <h4 class="modal-title custom_align" id="Heading">Borrar las salidas seleccionados</h4>
-            </div>
-            <form class="form-horizontal" action="" method="POST" id="multi-delete">
-                {% csrf_token %}
-                <input type="hidden" name="lending_id" value="">
-                <input type="hidden" name="rollback" value="true">
-                <input type="hidden" name="action" value="DELETE">
-                <div class="modal-body">
-                    <div class="alert alert-danger"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de eliminar estos Prestamos de la base de datos?</div>
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <div class="checkbox"><label><input type="checkbox" id="rollback" checked/> Regresar las cantidades de los productos a la Base de Datos</label></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-danger btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Eliminar</button>
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
-                </div>
-            </form>
-        </div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align" id="Heading">Borrar las salidas seleccionados</h4>
     </div>
+    <form class="form-horizontal" action="" method="POST" id="multi-delete">
+        {% csrf_token %}
+        <input type="hidden" name="lending_id" value="">
+        <input type="hidden" name="rollback" value="true">
+        <input type="hidden" name="action" value="DELETE">
+        <div class="modal-body">
+            <div class="alert alert-danger"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de eliminar estos Prestamos de la base de datos?</div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <div class="checkbox"><label><input type="checkbox" id="rollback" checked/> Regresar las cantidades de los productos a la Base de Datos</label></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-danger btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Eliminar</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
 </div>
 {% for lending in lendings %}
 <div class="modal fade" id="delete{{ lending.id }}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                <h4 class="modal-title custom_align" id="Heading">Borrar prestamo de {{ lending.date }}</h4>
-            </div>
-            <form class="form-horizontal" action="" method="POST" id="single-delete">
-                {% csrf_token %}
-                <input type="hidden" name="lending_id" value='["{{ lending.id }}"]'>
-                <input type="hidden" name="rollback" value="true">
-                <input type="hidden" name="action" value="DELETE">
-                <div class="modal-body">
-                    <div class="alert alert-danger"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de eliminar este Prestamo de la base de datos?</div>
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <div class="checkbox"><label><input type="checkbox" id="rollback" checked/> Regresar las cantidades de los productos a la Base de Datos</label></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-danger btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Eliminar</button>
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
-                </div>
-            </form>
-        </div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align" id="Heading">Borrar prestamo de {{ lending.date }}</h4>
     </div>
+    <form class="form-horizontal" action="" method="POST" id="single-delete">
+        {% csrf_token %}
+        <input type="hidden" name="lending_id" value='["{{ lending.id }}"]'>
+        <input type="hidden" name="rollback" value="true">
+        <input type="hidden" name="action" value="DELETE">
+        <div class="modal-body">
+            <div class="alert alert-danger"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de eliminar este Prestamo de la base de datos?</div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <div class="checkbox"><label><input type="checkbox" id="rollback" checked/> Regresar las cantidades de los productos a la Base de Datos</label></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-danger btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Eliminar</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
 </div>
 {% if lending.returned and lending.lending_product_set.all %}
 <div class="modal fade" id="output{{ lending.id }}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                <h4 class="modal-title custom_align" id="Heading">Generar salida del prestamo de {{ lending.date }}</h4>
-            </div>
-            <form class="form-horizontal" action="" method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="lending_id" value='["{{ lending.id }}"]'>
-                <input type="hidden" name="action" value="OUTPUT">
-                <div class="modal-body">
-                    <div class="alert alert-success"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de registrar la salida de los productos no devueltos de este Prestamo?</div>
-                    {% for product in lending.lending_product_set.all %}
-                        {% if product.amount > product.returned_amount %}
-                        <div class="form-group">
-                            <label for="{{ product.product.code }}" class="col-sm-10 control-label">{{ product.product.code }} - {{ product.product.name }}</label>
-                            <div class="col-sm-2">
-                                <input type="number" class="form-control" name="amount{{ product.product.code }}" value="{{ product.amount|substract:product.returned_amount }}" min="0" max="{{ product.amount|substract:product.returned_amount }}">
-                            </div>
-                        </div>
-                        {% else %}
-                        <input type='hidden'  name="amount{{ product.product.code }}" value="0">
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Registrar</button>
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
-                </div>
-            </form>
-        </div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align" id="Heading">Generar salida del prestamo de {{ lending.date }}</h4>
     </div>
+    <form class="form-horizontal" action="" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="lending_id" value='["{{ lending.id }}"]'>
+        <input type="hidden" name="action" value="OUTPUT">
+        <div class="modal-body">
+            <div class="alert alert-success"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de registrar la salida de los productos no devueltos de este Prestamo?</div>
+            {% for product in lending.lending_product_set.all %}
+                {% if product.amount > product.returned_amount %}
+                <div class="form-group">
+                    <label for="{{ product.product.code }}" class="col-sm-10 control-label">{{ product.product.code }} - {{ product.product.name }}</label>
+                    <div class="col-sm-2">
+                        <input type="number" class="form-control" name="amount{{ product.product.code }}" value="{{ product.amount|substract:product.returned_amount }}" min="0" max="{{ product.amount|substract:product.returned_amount }}">
+                    </div>
+                </div>
+                {% else %}
+                <input type='hidden'  name="amount{{ product.product.code }}" value="0">
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Registrar</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
 </div>
 {% endif %}
 <div class="modal fade" id="email{{ lending.id }}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                <h4 class="modal-title custom_align" id="Heading">Enviar prestamo de {{ lending.date }}</h4>
-            </div>
-            <form class="form-horizontal" action="" method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="lending_id" value='["{{ lending.id }}"]'>
-                <input type="hidden" name="action" value="EMAIL">
-                <div class="modal-body">
-                    <div class="alert alert-info"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de enviar este Prestamo por email?</div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-info btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Enviar</button>
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
-                </div>
-            </form>
-        </div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align" id="Heading">Enviar prestamo de {{ lending.date }}</h4>
     </div>
+    <form class="form-horizontal" action="" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="lending_id" value='["{{ lending.id }}"]'>
+        <input type="hidden" name="action" value="EMAIL">
+        <div class="modal-body">
+            <div class="alert alert-info"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de enviar este Prestamo por email?</div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-info btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Enviar</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
 </div>
 <div class="modal fade" id="return{{ lending.id }}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                <h4 class="modal-title custom_align" id="Heading">Devolver prestamo de {{ lending.date }}</h4>
-            </div>
-            <form class="form-horizontal" action="" method="POST" id="lending-return">
-                {% csrf_token %}
-                <input type="hidden" name="lending_id" value='["{{ lending.id }}"]'>
-                <input type="hidden" name="action" value="RETURN">
-                <div class="modal-body">
-                    <div class="alert alert-warning"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de devolver este Prestamo a la base de datos?</div>
-                    {% for product in lending.lending_product_set.all %}
-                    <div class="form-group">
-                        <label for="{{ product.product.code }}" class="col-sm-10 control-label">{{ product.product.code }} - {{ product.product.name }}</label>
-                        <div class="col-sm-2">
-                            <input type="number" class="form-control" name="amount{{ product.product.code }}" value="{{ product.amount }}" min="0" max="{{ product.amount }}">
-                        </div>
-                    </div>
-                    {% endfor %}
-                    {% for tool in lending.lending_tool_set.all %}
-                    <div class="form-group">
-                        <label for="{{ tool.tool.code }}" class="col-sm-10 control-label">{{ tool.tool.code }} - {{ tool.tool.name }}</label>
-                        <div class="col-sm-2">
-                            <input type="number" class="form-control" name="amount{{ tool.tool.code }}" value="{{ tool.amount }}" min="0" max="{{ tool.amount }}">
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-warning btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Devolver</button>
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
-                </div>
-            </form>
-        </div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align" id="Heading">Devolver prestamo de {{ lending.date }}</h4>
     </div>
+    <form class="form-horizontal" action="" method="POST" id="lending-return">
+        {% csrf_token %}
+        <input type="hidden" name="lending_id" value='["{{ lending.id }}"]'>
+        <input type="hidden" name="action" value="RETURN">
+        <div class="modal-body">
+            <div class="alert alert-warning"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de devolver este Prestamo a la base de datos?</div>
+            {% for product in lending.lending_product_set.all %}
+            <div class="form-group">
+                <label for="{{ product.product.code }}" class="col-sm-10 control-label">{{ product.product.code }} - {{ product.product.name }}</label>
+                <div class="col-sm-2">
+                    <input type="number" class="form-control" name="amount{{ product.product.code }}" value="{{ product.amount }}" min="0" max="{{ product.amount }}">
+                </div>
+            </div>
+            {% endfor %}
+            {% for tool in lending.lending_tool_set.all %}
+            <div class="form-group">
+                <label for="{{ tool.tool.code }}" class="col-sm-10 control-label">{{ tool.tool.code }} - {{ tool.tool.name }}</label>
+                <div class="col-sm-2">
+                    <input type="number" class="form-control" name="amount{{ tool.tool.code }}" value="{{ tool.amount }}" min="0" max="{{ tool.amount }}">
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-warning btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Devolver</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
 </div>
 {% endfor %}

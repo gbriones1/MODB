@@ -72,120 +72,105 @@
     </div>
 </div>
 <div class="modal fade" id="new_output" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                <h4 class="modal-title custom_align" id="Heading">Nueva salida</h4>
-            </div>
-            <form class="form-horizontal" action="" autocomplete="off" method="POST" id="create">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="CREATE">
-                <input type="hidden" name="outputProducts">
-                <div class="modal-body">
-                    {% for field in form %}
-                    <div class="form-group">
-                        <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
-                        <div class="col-sm-10">{{ field }}</div>
-                    </div>
-                    {% endfor %}
-                    <div class="form-group">
-                        <div class="col-sm-10 col-sm-offset-2">
-                            <button type="button" id="addOutputProduct" class="btn btn-info">Agregar <i class="fa fa-caret-square-o-down"></i></button>
-                            <button type="button" id="removeOutputProduct" class="btn btn-info">Remover <i class="fa fa-caret-square-o-up"></i></button>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="outputProducts" class="col-sm-2 control-label">Productos agregados</label>
-                        <div class="col-sm-10">
-                            <select id="outputProducts" multiple></select>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-sign"></span> Registrar</button>
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
-                </div>
-            </form>
-        </div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align" id="Heading">Nueva salida</h4>
     </div>
+    <form class="form-horizontal" action="" autocomplete="off" method="POST" id="create">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="CREATE">
+        <input type="hidden" name="outputProducts">
+        <div class="modal-body">
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
+                <div class="col-sm-10">{{ field }}</div>
+            </div>
+            {% endfor %}
+            <div class="form-group">
+                <div class="col-sm-10 col-sm-offset-2">
+                    <button type="button" id="addOutputProduct" class="btn btn-info">Agregar <i class="fa fa-caret-square-o-down"></i></button>
+                    <button type="button" id="removeOutputProduct" class="btn btn-info">Remover <i class="fa fa-caret-square-o-up"></i></button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="outputProducts" class="col-sm-2 control-label">Productos agregados</label>
+                <div class="col-sm-10">
+                    <select id="outputProducts" multiple></select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-ok-sign"></span> Registrar</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
 </div>
 <div class="modal fade" id="delete" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                <h4 class="modal-title custom_align" id="Heading">Borrar las salidas seleccionados</h4>
-            </div>
-            <form class="form-horizontal" action="" method="POST" id="multi-delete">
-                {% csrf_token %}
-                <input type="hidden" name="output_id" value="">
-                <input type="hidden" name="rollback" value="true">
-                <input type="hidden" name="action" value="DELETE">
-                <div class="modal-body">
-                    <div class="alert alert-danger"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de eliminar estas Salidas de la base de datos?</div>
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <div class="checkbox"><label><input type="checkbox" id="rollback" checked/> Quitar las cantidades de los productos de la Base de Datos</label></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-danger btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Eliminar</button>
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
-                </div>
-            </form>
-        </div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align" id="Heading">Borrar las salidas seleccionados</h4>
     </div>
+    <form class="form-horizontal" action="" method="POST" id="multi-delete">
+        {% csrf_token %}
+        <input type="hidden" name="output_id" value="">
+        <input type="hidden" name="rollback" value="true">
+        <input type="hidden" name="action" value="DELETE">
+        <div class="modal-body">
+            <div class="alert alert-danger"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de eliminar estas Salidas de la base de datos?</div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <div class="checkbox"><label><input type="checkbox" id="rollback" checked/> Quitar las cantidades de los productos de la Base de Datos</label></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-danger btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Eliminar</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
 </div>
 {% for output_reg in outputs %}
 <div class="modal fad" id="delete{{ output_reg.id }}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                <h4 class="modal-title custom_align" id="Heading">Borrar salida de {{ output_reg.date }}</h4>
-            </div>
-            <form class="form-horizontal" action="" method="POST" id="single-delete">
-                {% csrf_token %}
-                <input type="hidden" name="output_id" value='["{{ output_reg.id }}"]'>
-                <input type="hidden" name="rollback" value="true">
-                <input type="hidden" name="action" value="DELETE">
-                <div class="modal-body">
-                    <div class="alert alert-danger"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de eliminar esta Salida de la base de datos?</div>
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <div class="checkbox"><label><input type="checkbox" id="rollback" checked/> Quitar las cantidades de los productos de la Base de Datos</label></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-danger btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Eliminar</button>
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
-                </div>
-            </form>
-        </div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align" id="Heading">Borrar salida de {{ output_reg.date }}</h4>
     </div>
-</div><div class="modal fad" id="email{{ output_reg.id }}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                <h4 class="modal-title custom_align" id="Heading">Enviar salida de {{ output_reg.date }}</h4>
+    <form class="form-horizontal" action="" method="POST" id="single-delete">
+        {% csrf_token %}
+        <input type="hidden" name="output_id" value='["{{ output_reg.id }}"]'>
+        <input type="hidden" name="rollback" value="true">
+        <input type="hidden" name="action" value="DELETE">
+        <div class="modal-body">
+            <div class="alert alert-danger"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de eliminar esta Salida de la base de datos?</div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <div class="checkbox"><label><input type="checkbox" id="rollback" checked/> Quitar las cantidades de los productos de la Base de Datos</label></div>
+                </div>
             </div>
-            <form class="form-horizontal" action="" method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="output_id" value='["{{ output_reg.id }}"]'>
-                <input type="hidden" name="action" value="EMAIL">
-                <div class="modal-body">
-                    <div class="alert alert-info"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de enviar esta Salida por email?</div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-info btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Enviar</button>
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
-                </div>
-            </form>
         </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-danger btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Eliminar</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
+</div>
+<div class="modal fad" id="email{{ output_reg.id }}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align" id="Heading">Enviar salida de {{ output_reg.date }}</h4>
     </div>
+    <form class="form-horizontal" action="" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="output_id" value='["{{ output_reg.id }}"]'>
+        <input type="hidden" name="action" value="EMAIL">
+        <div class="modal-body">
+            <div class="alert alert-info"><span class="glyphicon glyphicon-warning-sign"></span> Esta seguro de enviar esta Salida por email?</div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-info btn-lg" ><span class="glyphicon glyphicon-ok-sign"></span> Enviar</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
 </div>
 {% endfor %}
