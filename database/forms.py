@@ -73,7 +73,7 @@ class ProductForm(forms.ModelForm):
     description = forms.CharField(max_length=255, label='Descripcion', required=False)
     appliance = forms.ModelMultipleChoiceField(queryset=Appliance.objects.all(), required=False, label="Aplicacion")
     price = forms.DecimalField(max_digits=9, decimal_places=2, label='Precio de lista', required=True, min_value=0, initial=0)
-    discount = forms.IntegerField(label='Descuento', initial=0, min_value=0, max_value=100)
+    discount = forms.DecimalField(max_digits=9, decimal_places=2, label='Descuento', required=False, initial=0, min_value=0, max_value=100)
     real_price = forms.DecimalField(max_digits=9, decimal_places=2, label='Precio real', required=False, initial=0, min_value=0, widget=forms.widgets.NumberInput(attrs={'disabled':'disabled'}))
     classification = forms.ModelChoiceField(queryset=Classification.objects.all(), required=False, label="Porcentaje", widget=Datalist())
     in_used = forms.IntegerField(label='Obsoletas', initial=0, min_value=0)
