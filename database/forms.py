@@ -8,7 +8,7 @@ from django.utils.html import conditional_escape, format_html
 from django.forms.utils import flatatt
 from django.utils.safestring import mark_safe
 
-from models import Product, Tool, Provider, Appliance, Classification, Brand, Lending, Input_Product, Output_Product, Lending_Product, Configuration
+from models import Product, Tool, Provider, Appliance, Classification, Brand, Lending, Input_Product, Output_Product, Lending_Product, Configuration, BackupManager
 
 from datetime import datetime
 
@@ -248,3 +248,11 @@ class OrderInputForm(forms.ModelForm):
     class Meta:
         model = Input_Product
         fields = ['date', 'storage']
+
+class BackupForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        super(BackupForm, self).__init__(*args, **kwargs)
+        self.fields['backups'] = forms.ChoiceField(label='Respaldos Existentes', choices=BackupManager().get_backups())
+
+    backups = forms.ChoiceField()

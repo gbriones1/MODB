@@ -20,5 +20,6 @@ urlpatterns = patterns('',
 	url(r'classifications/$', 'database.views.classifications', name='classifications'),
 	url(r'registry/$', 'database.views.registry', name='registry'),
 	url(r'settings/$', 'database.views.settings', name='settings'),
+	url(r'settings/backup/$', 'database.views.backup', name='backup'),
 	url(r'^$', 'database.views.dashboard', name='dashboard'),
 )

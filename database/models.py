@@ -1,5 +1,9 @@
 from django.contrib import admin
 from django.db import models
+# from lib.email_client import send_email
+import os
+import shutil
+import datetime
 
 class Appliance(models.Model):
     name = models.CharField(max_length=100)
@@ -152,3 +156,35 @@ class InputAdmin(admin.ModelAdmin):
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Input_Product, InputProductAdmin)
 admin.site.register(Input, InputAdmin)
+
+class BackupManager(object):
+
+    DIRECTORY = os.path.join(os.getcwd(), "backups")
+
+    def get_backups(self):
+        backups = []
+        for db in os.listdir(BackupManager.DIRECTORY):
+            if len(db) == 24 and db.endswith(".sqlite3") and db.startswith("db") and db[2:-8].isdigit():
+                formatted_date = db[2:-8][:4]+"-"+db[2:-8][4:6]+"-"+db[2:-8][6:8]+" "+db[2:-8][8:10]+":"+db[2:-8][10:12]+":"+db[2:-8][12:14]
+                backups.append((db, formatted_date))
+        return backups
+
+    def create_backup(self):
+        current_db = os.path.join(os.getcwd(), "db.sqlite3")
+        new_db = os.path.join(BackupManager.DIRECTORY, "db"+datetime.datetime.now().strftime('%Y%m%d%H%M%S')+".sqlite3")
+        shutil.copy(current_db, new_db)
+
+    def restore_backup(self, backup_file):
+        current_db = os.path.join(os.getcwd(), "db.sqlite3")
+        new_db = os.path.join(BackupManager.DIRECTORY, backup_file)
+        shutil.copy(new_db, current_db)
+
+    def delete_backup(self, backup_file):
+        os.remove(os.path.join(BackupManager.DIRECTORY, backup_file))
+
+    # def send_backup(self, backup_file):
+    #     conf = Configuration.objects.all()[0]
+    #     return conf.receiver_email and send_email(conf.receiver_email, "Respaldo de la Base de Datos", "", files=[backup_file])
+            
+    def upload_backup(self, file):
+        pass

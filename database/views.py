@@ -3,12 +3,14 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
-from database.models import Product, Tool, Input, Output, Lending, Input_Product, Output_Product, Lending_Product, Lending_Tool, Provider, Appliance, Classification, Brand, Order, Configuration, Order_Product
-from database.forms import ProductForm, ToolForm, ProductInputForm, ProductOutputForm, ProductLendingForm, ToolLendingForm, ProviderForm, ApplianceForm, BrandForm, ClassificationForm, UpdateProviderForm, UpdateBrandForm, UpdateApplianceForm, UpdateClassificationForm, ConfigurationForm, OrderInputForm
+from django.views.decorators.cache import never_cache
+from database.models import Product, Tool, Input, Output, Lending, Input_Product, Output_Product, Lending_Product, Lending_Tool, Provider, Appliance, Classification, Brand, Order, Configuration, Order_Product, BackupManager
+from database.forms import ProductForm, ToolForm, ProductInputForm, ProductOutputForm, ProductLendingForm, ToolLendingForm, ProviderForm, ApplianceForm, BrandForm, ClassificationForm, UpdateProviderForm, UpdateBrandForm, UpdateApplianceForm, UpdateClassificationForm, ConfigurationForm, OrderInputForm, BackupForm
 from lib.email_client import send_email
 from datetime import datetime
 import calendar
 import json, operator
+import os
 import pdb
 
 def get_messages(request):
@@ -997,10 +999,12 @@ def expenses(request):
 
 ### SETTINGS VIEW ###
 
+@login_required
 def settings(request):
     settings_active = "active"
     conf = Configuration.objects.all()[0]
     form = ConfigurationForm(instance=conf)
+    backupform = BackupForm()
     if request.method == "POST":
         form = ConfigurationForm(request.POST, instance=conf)
         if form.is_valid():
@@ -1009,4 +1013,41 @@ def settings(request):
             set_messages(request, [("Configuracion no guardada, los datos no fueron validos", "danger")])
         return HttpResponseRedirect("/settings/")
     messages = get_messages(request)
+    scripts = ["settings"]
     return render_to_response('pages/settings.html', locals(), context_instance=RequestContext(request))
+
+def backup(request):
+    if request.method == "POST":
+        action = request.POST.get('action', '')
+        if action == "CREATE":
+            BackupManager().create_backup()
+            add_message(request, ("Respaldo de la base de datos generado exitosamente", "success"))
+        elif action == "UPLOAD":
+            pass
+        elif action == "SEND":
+            backup = request.POST["backups"]
+            if backup:
+                conf = Configuration.objects.all()[0]
+                backup_file = os.path.join(BackupManager.DIRECTORY, backup)
+                if conf.receiver_email and send_email(conf.receiver_email, "Respaldo de la Base de Datos", "", files=[backup_file]):
+                    add_message(request, ("Respaldo de la base de datos enviado exitosamente", "success"))
+                else:
+                    add_message(request, ("Respaldo no enviado, correo no valido", "danger"))
+            else:
+                add_message(request, ("Respaldo no enviado, seleccione un respaldo", "danger"))
+        elif action == "RESTORE":
+            backup = request.POST["backup"]
+            if backup:
+                BackupManager().restore_backup(backup)
+                add_message(request, ("Respaldo de la base de datos restaurado exitosamente", "success"))
+            else:
+                add_message(request, ("Respaldo no realizado, seleccione un respaldo", "danger"))
+        elif action == "DELETE":
+            backup = request.POST["backup"]
+            if backup:
+                BackupManager().delete_backup(backup)
+                add_message(request, ("Respaldo de la base de datos eliminado exitosamente", "success"))
+            else:
+                add_message(request, ("Eliminacion no realizada, seleccione un respaldo", "danger"))
+    return HttpResponseRedirect("/settings/")
+
