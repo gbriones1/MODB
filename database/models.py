@@ -7,24 +7,44 @@ import datetime
 
 class Appliance(models.Model):
     name = models.CharField(max_length=100)
+
     def __unicode__(self):
         return self.name
+
+    def products_related(self):
+        products = Product.objects.filter(appliance=self)
+        return len(products)
 
 class Provider(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField(blank=True, null=True)
+
     def __unicode__(self):
         return self.name
+
+    def products_related(self):
+        products = Product.objects.filter(provider=self)
+        return len(products)
 
 class Brand(models.Model):
     name = models.CharField(max_length=100)
+
     def __unicode__(self):
         return self.name
 
+    def products_related(self):
+        products = Product.objects.filter(brand=self)
+        return len(products)
+
 class Classification(models.Model):
     name = models.CharField(max_length=100)
+
     def __unicode__(self):
         return self.name
+
+    def products_related(self):
+        products = Product.objects.filter(classification=self)
+        return len(products)
 
 class Tool(models.Model):
     code = models.CharField(max_length=30, primary_key=True)

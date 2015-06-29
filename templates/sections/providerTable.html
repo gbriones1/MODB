@@ -27,6 +27,7 @@
                 {% endif %}
                 <th>Nombre</th>
                 <th>Email</th>
+                <th>Refacciones</th>
                 {% if request.user.is_superuser %}
                 <th style="text-align: center;">Actualizar</th>
                 <th style="text-align: center;">Eliminar</th>
@@ -40,6 +41,7 @@
                     {% endif %}
                     <td>{{ provider.name }}</td>
                     <td>{{ provider.email }}</td>
+                    <td>{{ provider.products_related }}</td>
                     {% if request.user.is_superuser %}
                     <td align="center"><p data-placement="top" data-toggle="tooltip" title="Actualizar {{ provider.name }}"><button class="btn btn-success" data-title="Edit" data-toggle="modal" data-target="#edit{{ provider.id }}" ><span class="glyphicon glyphicon-pencil"></span></button></p></td>
                     <td align="center"><p data-placement="top" data-toggle="tooltip" title="Eliminar {{ provider.name }}"><button class="btn btn-danger" data-title="Delete" data-toggle="modal" data-target="#delete{{ provider.id }}" ><span class="glyphicon glyphicon-trash"></span></button></p></td>
