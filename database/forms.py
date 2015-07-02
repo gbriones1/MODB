@@ -33,7 +33,7 @@ class ProductSelect(forms.widgets.Select):
                            self.choices.queryset.get(code=option_value).price,
                            self.choices.queryset.get(code=option_value).discount,
                            selected_html,
-                           force_text(option_label))
+                           force_text(option_label).encode("ascii", "ignore"))
 
 class Datalist(forms.widgets.Select):
     def render(self, name, value, attrs=None, choices=()):

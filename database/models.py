@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db import models
 # from lib.email_client import send_email
+import settings
 import os
 import shutil
 import datetime
@@ -179,7 +180,14 @@ admin.site.register(Input, InputAdmin)
 
 class BackupManager(object):
 
-    DIRECTORY = os.path.join(os.getcwd(), "backups")
+    #DIRECTORY = os.path.join(os.getcwd(), "backups") if settings.DEBUG else "C:\\MODB\\backups/"
+    DIRECTORY = "C:\\MODB\\backups/"
+
+    def get_current_db(self):
+        #if settings.DEBUG:
+        #    return os.path.join(os.getcwd(), "db.sqlite3")
+        #else:
+        return "C:\\MODB\\db.sqlite3"
 
     def get_backups(self):
         backups = []
@@ -190,12 +198,12 @@ class BackupManager(object):
         return backups
 
     def create_backup(self):
-        current_db = os.path.join(os.getcwd(), "db.sqlite3")
+        current_db = self.get_current_db()
         new_db = os.path.join(BackupManager.DIRECTORY, "db"+datetime.datetime.now().strftime('%Y%m%d%H%M%S')+".sqlite3")
         shutil.copy(current_db, new_db)
 
     def restore_backup(self, backup_file):
-        current_db = os.path.join(os.getcwd(), "db.sqlite3")
+        current_db = self.get_current_db()
         new_db = os.path.join(BackupManager.DIRECTORY, backup_file)
         shutil.copy(new_db, current_db)
 
