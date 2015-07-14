@@ -571,6 +571,10 @@ def outputs(request):
                 if not conf.receiver_email or not send_email(conf.receiver_email, "Registro de salida", message):
                     messages.append(("Correo de registro de salida no enviado, correo no valido", "warning"))
             set_messages(request, messages)
+        elif action == "MULTIEMAIL":
+            messages = []
+            # pdb.set_trace()
+            set_messages(request, messages)
         return HttpResponseRedirect('/outputs/?start_date='+formatted_start_date+"&end_date="+formatted_end_date)
     form = ProductOutputForm()
     scripts = ['productOutput']

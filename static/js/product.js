@@ -268,3 +268,19 @@ $('table').DataTable().columns().every( function () {
         that.search( this.value ).draw();
     } );
 } );
+
+
+$(window).bind('beforeunload', function(){
+	var temporaryInput = {}
+	$('#new form input').each(function() {
+		temporaryInput[$(this).attr('name')] = $(this).val();
+	});
+	sessionStorage.setItem("NewProduct", JSON.stringify(temporaryInput));
+});
+
+if (sessionStorage.getItem("NewProduct")){
+	var temporaryInput = JSON.parse(sessionStorage.getItem("NewProduct"));
+	$('#new form input').each(function() {
+		$(this).val(temporaryInput[$(this).attr("name")]);
+	});
+}

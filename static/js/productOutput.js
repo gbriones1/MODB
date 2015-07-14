@@ -153,3 +153,63 @@ filterProvider.change(function (argument) {
 		});
 	}
 });
+
+$('table#outputs tfoot th').each( function () {
+    var title = $('table#outputs thead th').eq( $(this).index() ).text();
+    if (title != '' && title != "Enviar" && title != "Eliminar"){
+    	$(this).html( '<input type="text" placeholder="Buscar '+title+'" class="form-control" />' );
+    }
+    else{
+    	$(this).html( '<input style="display: none;" type="text" placeholder="Buscar '+title+'" class="form-control" />' );
+    }
+} );
+
+$('table#outputs').dataTable({
+    "sScrollY": ($(window).height()-450)+"px",
+    "sScrollX": "98%",
+    "bScrollCollapse": true,
+    "bPaginate": false,
+    "sDom": '<"top">rt<"bottom"lp><"clear">',
+    "aoColumnDefs" : [ {
+        'bSortable' : false,
+        'aTargets' : [ 0, -1, -2 ]
+    } ],
+    "aaSorting": [[1,'asc']]
+});
+
+$('table#outputs').DataTable().columns().every( function () {
+    var that = this;
+    $( 'input', this.footer() ).on( 'keyup change', function () {
+        that.search( this.value ).draw();
+    } );
+} );
+
+
+
+$('#multi-email').click(function() {
+	var emailListTable = $('#email-list tbody');
+	emailListTable.empty()
+	$("table#outputs tbody tr").each(function () {
+		if ($(this).find(".checkthis").is(":checked")){
+			var row = $(this).clone();
+			row.find(":first-child").remove();
+			row.find(":last-child").remove();
+			row.find(":last-child").remove();
+			emailListTable.append(row);
+		}
+	});
+	var emailList = $('table#email-list')
+	if (!emailList.hasClass("dataTable")){
+		emailList.dataTable({
+		    // "sScrollY": "600px",
+		    "sScrollX": "98%",
+		    "bScrollCollapse": true,
+		    "bPaginate": false,
+		    "sDom": '<"top">rt<"bottom"lp><"clear">',
+		    "aoColumnDefs" : [ {
+		        'bSortable' : false,
+		        'aTargets' : [ 0, -1, -2 ]
+		    } ],
+		});
+	}
+});
