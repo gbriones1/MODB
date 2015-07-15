@@ -573,7 +573,48 @@ def outputs(request):
             set_messages(request, messages)
         elif action == "MULTIEMAIL":
             messages = []
-            # pdb.set_trace()
+            product_output_ids = json.loads(str(request.POST.get('product_output_id', "[]")))
+            destination = request.POST.get("destination", "")
+            if not product_output_ids:
+                messages.append(("Ninguna salida seleccionada.", "warning"))
+            if not destination:
+                messages.append(("Ningun email seleccionado.", "warning"))
+            if not messages:
+                product_outputs = Output_Product.objects.filter(id__in=product_output_ids)
+                email_text = ""
+                total_sum = 0
+                for product_output in product_outputs:
+                    if request.POST.get("dateColumn", ""):
+                        email_text += product_output.output_reg.date.strftime("%Y-%m-%d")+"\t"
+                    if request.POST.get("employeeColumn"):
+                        email_text += product_output.output_reg.employee+"\t"
+                    if request.POST.get("destinationColumn"):
+                        email_text += product_output.output_reg.destination+"\t"
+                    if request.POST.get("codeColumn"):
+                        email_text += product_output.product.code+"\t"
+                    if request.POST.get("brandColumn"):
+                        email_text += product_output.product.brand.name+"\t"
+                    if request.POST.get("providerColumn"):
+                        email_text += product_output.product.provider.name+"\t"
+                    if request.POST.get("nameColumn"):
+                        email_text += product_output.product.name+"\t"
+                    if request.POST.get("amountColumn"):
+                        email_text += str(product_output.amount)+"\t"
+                    if request.POST.get("silglePriceColumn"):
+                        email_text += "$"+str(product_output.product.price)+"\t"
+                    if request.POST.get("totalPriceColumn"):
+                        total_sum += float(product_output.product.price*product_output.amount)
+                        email_text += "$"+str(product_output.product.price*product_output.amount)+"\t"
+                    if request.POST.get("storageColumn"):
+                        email_text += product_output.output_reg.get_storage_display()+"\t"
+                    email_text += "\n"
+                email_text += "\n"
+                if request.POST.get("totalPriceColumn"):
+                    email_text += "Total:\t$"+str(total_sum)
+                if not send_email(destination, "Reporte de salida", email_text):
+                    messages.append(("Correo de registro de salida no enviado, correo no valido", "warning"))
+            else:
+                messages.append(("Seleccion de salidas no enviada.", "error"))
             set_messages(request, messages)
         return HttpResponseRedirect('/outputs/?start_date='+formatted_start_date+"&end_date="+formatted_end_date)
     form = ProductOutputForm()

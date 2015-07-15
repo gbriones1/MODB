@@ -188,6 +188,7 @@ $('table#outputs').DataTable().columns().every( function () {
 
 $('#multi-email').click(function() {
 	var emailListTable = $('#email-list tbody');
+	var totalSum = 0;
 	emailListTable.empty()
 	$("table#outputs tbody tr").each(function () {
 		if ($(this).find(".checkthis").is(":checked")){
@@ -196,12 +197,13 @@ $('#multi-email').click(function() {
 			row.find(":last-child").remove();
 			row.find(":last-child").remove();
 			emailListTable.append(row);
+			totalSum += parseFloat(row.find('.product-total').text().substring(1))
 		}
 	});
+	$(".total-sum").text("$"+totalSum);
 	var emailList = $('table#email-list')
 	if (!emailList.hasClass("dataTable")){
 		emailList.dataTable({
-		    // "sScrollY": "600px",
 		    "sScrollX": "98%",
 		    "bScrollCollapse": true,
 		    "bPaginate": false,
@@ -212,4 +214,12 @@ $('#multi-email').click(function() {
 		    } ],
 		});
 	}
+});
+
+$("#multi-email-form").submit(function () {
+	var outputProducts = [];
+	$('#email-list tbody tr').each(function () {
+		outputProducts.push($(this).attr("data-id"));
+	});
+	$('input[name="product_output_id"]').val(JSON.stringify(outputProducts))
 });
