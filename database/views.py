@@ -928,6 +928,24 @@ def shopping(request):
     orders = Order.objects.filter(date__gte=start_date, date__lte=end_date).order_by('-date')
     if request.method == "POST":
         action = request.POST.get('action', '')
+        if action == "CREATE":
+            codes = request.POST.keys()
+            codes.remove('csrfmiddlewaretoken')
+            codes.remove('subject')
+            codes.remove('text')
+            products = Product.objects.filter(code__in=codes)
+            if len(products):
+                provider_products = {}
+                for product in products:
+                    if product.provider.id in provider_products.keys():
+                        provider_products[product.provider.id].append(product)
+                    else:
+                        provider_products[product.provider.id] = [product]
+                for provider_id in provider_products.keys():
+                    provider = Provider.objects.get(id=provider_id)
+                    createOrder(provider, provider_products[provider_id], request.POST.get("subject", ""), request.POST.get("text", ""), request)
+            else:
+                set_messages(request, [("Ningun producto pedido. Orden no enviada", "warning")])
         if action == "INPUT":
             for order in Order.objects.filter(id__in=json.loads(str(request.POST.get('order_id', "[]")))):
                 product_amount = {}

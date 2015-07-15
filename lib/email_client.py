@@ -24,7 +24,7 @@ def send_email(destination, subject, text, files=[]):
     message['From'] = FROM
     message['To'] = ', '.join(TO)
 
-    message.attach(MIMEText(text))
+    message.attach(MIMEText(text.encode("utf-8"), 'plain', 'utf-8'))
 
     for f in files or []:
         with open(f, "rb") as fil:
