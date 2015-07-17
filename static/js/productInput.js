@@ -6,11 +6,12 @@ $('#addInputProduct').click(function (argument) {
 	var selectedProducts = $('#id_product option:selected');
 	if (selectedProducts.length){
 		selectedProducts.each(function(){
-			if(!$inputProductsSelect.find("option[value^='"+$(this).val()+"']").length){
+			if(!$inputProductsSelect.find("option[data-id='"+$(this).val()+"']").length){
 				var productOpt = $(this)
 				if ((parseFloat($(this).attr('price'))).toFixed(2) == parseFloat(price) && (parseFloat($(this).attr('discount'))).toFixed(2) == discount){
 		            $inputProductsSelect.append($('<option>', {
 		                value:productOpt.val()+":"+amount+":"+price+":"+discount,
+		                "data-id":productOpt.val(),
 		                text:productOpt.text()+ " x "+amount+" x $"+price+" - "+discount+"%"
 		            }));
 		            $('select#id_storage').attr('disabled', true);

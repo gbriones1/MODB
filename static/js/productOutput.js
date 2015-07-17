@@ -51,9 +51,10 @@ $('#addOutputProduct').click(function (argument) {
 	}
 	if (selectedProducts.length){
 		selectedProducts.each(function(){
-			if(!$outputProductsSelect.find("option[value^='"+$(this).val()+"']").length){
+			if(!$outputProductsSelect.find("option[data-id='"+$(this).val()+"']").length){
 	            $outputProductsSelect.append($('<option>', {
 	                value:$(this).val()+":"+amount,
+		            "data-id":$(this).val(),
 	                text:$(this).text()+ " x "+amount
 	            }));
 	            $('select#id_storage').attr('disabled', true);
