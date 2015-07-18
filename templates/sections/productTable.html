@@ -18,7 +18,7 @@
                 {% endif %}
             </div>
             <div class="col-md-1 col-sm-2">
-                <p data-placement="top" data-toggle="tooltip" title="Realizar cotizacion de productos"><button type="button" class="btn btn-info btn-lg btn-block" data-toggle="modal" data-target="#pricing-list"><i class="fa fa-dollar"></i></button></p>
+                <p data-placement="top" data-toggle="tooltip" title="Realizar cotizacion de productos"><button type="button" id="pricing-btn" class="btn btn-info btn-lg btn-block" data-toggle="modal" data-target="#pricing-list"><i class="fa fa-dollar"></i></button></p>
             </div>
             {% if request.user.is_superuser %}
             <div class="col-md-1 col-sm-2">
@@ -32,7 +32,7 @@
     </div>
     <div class="row">
     <div class="table-responsive">
-        <table class="table table-bordred table-striped table-hover">
+        <table class="table table-bordred table-striped table-hover" id="products">
             <thead>
                 <tr>
                     <th><input type="checkbox" id="checkall" /></th>
@@ -85,7 +85,7 @@
             </tfoot>
             <tbody>
                 {% for product in products %}
-                <tr id="{{ product.code }}" data-code="{{ product.code }}" data-brand="{{ product.brand.id }}" data-provider="{{ product.provider.id }}" data-name="{{ product.name }}" data-description="{{ product.description }}" data-price="{{ product.price }}" data-appliance="{% for appliance in product.appliance.all %}{{ appliance.id }}:{% endfor %}">
+                <tr id="{{ product.code }}" data-code="{{ product.code }}" data-brand="{{ product.brand.id }}" data-provider="{{ product.provider.id }}" data-name="{{ product.name }}" data-description="{{ product.description }}" data-price="{{ product.price }}" data-appliance="{% for appliance in product.appliance.all %}{{ appliance.id }}:{% endfor %}" data-percentage-one="{{ product.percentage_1 }}" data-percentage-two="{{ product.percentage_2 }}" data-percentage-three="{{ product.percentage_3 }}">
                     <td><input type="checkbox" class="checkthis" value="{{ product.code }}" /></td>
                     <td>{{ product.code }}</td>
                     <td>{{ product.brand }}</td>
@@ -127,6 +127,62 @@
         </table>
     </div>
     </div>
+</div>
+<div class="modal fade" id="pricing-list" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <h4 class="modal-title custom_align" id="Heading">Envar correo</h4>
+    </div>
+    <form class="form-horizontal" action="" autocomplete="off" method="POST" id="multi-email-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="MULTIEMAIL">
+        <input type="hidden" name="product_id">
+        <div class="modal-body">
+            <table id="email-list" class="table table-bordred table-striped table-condensed table-condensed" >
+                <thead>
+                    <tr>
+                        <th style="text-align: center;"><input type="checkbox" name="codeColumn"/></th>
+                        <th style="text-align: center;"><input type="checkbox" name="brandColumn"/></th>
+                        <th style="text-align: center;"><input type="checkbox" name="providerColumn"/></th>
+                        <th style="text-align: center;"><input type="checkbox" name="nameColumn"/></th>
+                        <th style="text-align: center;"><input type="checkbox" name="descriptionColumn"/></th>
+                        <th style="text-align: center;"><input type="checkbox" name="applianceColumn"/></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th>Codigo</th>
+                        <th>Marca</th>
+                        <th>Proveedor</th>
+                        <th>Nombre</th>
+                        <th>Descripcion</th>
+                        <th>Aplicacion</th>
+                        <th>Precio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <div class="radio">
+                      <label><input type="radio" name="percentage" value="percentage1" checked>Porcentaje 1: <p class="percentage1"></p></label>
+                    </div>
+                    <div class="radio">
+                      <label><input type="radio" name="percentage" value="percentage2">Porcentaje 2: <p class="percentage2"></p></label>
+                    </div>
+                    <div class="radio">
+                      <label><input type="radio" name="percentage" value="percentage3">Porcentaje 3: <p class="percentage3"></p></label>
+                    </div>
+                </div>
+                <label for="" class="col-sm-4 control-label">Email</label>
+                <div class="col-sm-7"><input type="email" name="destination"></div>
+            </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-info btn-lg"><span class="glyphicon glyphicon-ok-sign"></span> Enviar</button>
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+        </div>
+    </form>
 </div>
 {% if request.user.is_superuser %}
 <div class="modal fade" id="new" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">

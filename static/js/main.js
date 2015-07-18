@@ -3,7 +3,7 @@ webshims.setOptions('forms-ext', {types: 'date'});
 webshims.polyfill('forms forms-ext');
 
 $('div.form-group input').each(function(){
-    if ($(this).attr("type")!="checkbox"){
+    if ($(this).attr("type")!="checkbox" && $(this).attr("type")!="radio"){
         $(this).addClass("form-control")
     }
 });

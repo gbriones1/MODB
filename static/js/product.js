@@ -138,7 +138,7 @@ function getSelectedProducts () {
 }
 
 function filterProducts (field, query) {
-	$('table tbody tr').each(function(){
+	$('table#products tbody tr').each(function(){
 		var value = $(this).attr('data-'+field);
 		if (value.indexOf(query)+1){
 			$(this).show();
@@ -160,7 +160,7 @@ $(".select-filter").change(function () {
 $(".multi-select-filter").change(function () {
 	var query = $(this).val()
 	var field = $(this).attr("data-field")
-	$('table tbody tr').each(function(){
+	$('table#products tbody tr').each(function(){
 		var allValue = $(this).attr('data-'+field);
 		var found = false;
 		if (allValue){
@@ -239,8 +239,8 @@ $(document).on('click', 'button.delete-modal', function () {
     $('#single-delete input[name="code"]').val('["'+$(this).attr('data-id')+'"]');
 });
 
-$('table tfoot th').each( function () {
-    var title = $('table thead th').eq( $(this).index() ).text();
+$('table#products tfoot th').each( function () {
+    var title = $('table#products thead th').eq( $(this).index() ).text();
     if (title != '' && title != "Actualizar" && title != "Eliminar"){
     	$(this).html( '<input type="text" placeholder="Buscar '+title+'" class="form-control" />' );
     }
@@ -249,7 +249,7 @@ $('table tfoot th').each( function () {
     }
 } );
 
-$('table').dataTable({
+$('table#products').dataTable({
     "sScrollY": ($(window).height()-320)+"px",
     "sScrollX": "98%",
     "bScrollCollapse": true,
@@ -262,7 +262,7 @@ $('table').dataTable({
     "aaSorting": [[1,'asc']]
 });
 
-$('table').DataTable().columns().every( function () {
+$('table#products').DataTable().columns().every( function () {
     var that = this;
     $( 'input', this.footer() ).on( 'keyup change', function () {
         that.search( this.value ).draw();
@@ -284,3 +284,45 @@ if (sessionStorage.getItem("NewProduct")){
 		$(this).val(temporaryInput[$(this).attr("name")]);
 	});
 }
+
+$('#pricing-btn').click(function() {
+	var emailListTable = $('#email-list tbody');
+	var totalSum1 = 0;
+	var totalSum2 = 0;
+	var totalSum3 = 0;
+	emailListTable.empty()
+	$("table#products tbody tr").each(function () {
+		if ($(this).find(".checkthis").is(":checked")){
+			var row = $(this).clone();
+			totalSum1 += parseFloat(row.attr("data-percentage-one"));
+			totalSum2 += parseFloat(row.attr("data-percentage-two"));
+			totalSum3 += parseFloat(row.attr("data-percentage-three"));
+			row.find(":first-child").remove();
+			row.find(":last-child").remove();
+			row.find(":last-child").remove();
+			row.find(":last-child").remove();
+			row.find(":last-child").remove();
+			row.find(":last-child").remove();
+			emailListTable.append(row);
+		}
+	});
+	$("p.percentage1").text("$"+totalSum1.toFixed(2));
+	$("p.percentage2").text("$"+totalSum2.toFixed(2));
+	$("p.percentage3").text("$"+totalSum3.toFixed(2));
+	var emailList = $('table#email-list')
+	if (!emailList.hasClass("dataTable")){
+		emailList.dataTable({
+		    "sScrollX": "98%",
+		    "bScrollCollapse": true,
+		    "bPaginate": false,
+		    "sDom": '<"top">rt<"bottom"lp><"clear">',
+		    "aoColumnDefs" : [ {
+		        'bSortable' : false,
+		        'aTargets' : [ 0, -1, -2 ]
+		    } ],
+		});
+		$("#email-list_wrapper thead tr input").each(function () {
+			$(this).attr("checked", true)
+		});
+	}
+});
