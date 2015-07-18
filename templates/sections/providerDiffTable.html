@@ -27,7 +27,7 @@
                             </thead>
                             <tbody>
                                 {% for product in provider.products %}
-                                <tr id="{{ product.code }}" data-code="{{ product.code }}" data-model="{{ product.model }}" data-provider="{{ product.provider.id }}" data-name="{{ product.name }}" data-description="{{ product.description }}" data-price="{{ product.price }}" data-classification="{{ product.classification.id }}" class="product-row">
+                                <tr id="{{ product.code }}" data-code="{{ product.code }}" data-model="{{ product.model }}" data-provider="{{ product.provider.id }}" data-name="{{ product.name }}" data-description="{{ product.description }}" data-price="{{ product.price }}" class="product-row">
                                     <td>{{ product.code }}</td>
                                     <td>{{ product.model }}</td>
                                     <td class="product-name">{{ product.name }}</td>

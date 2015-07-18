@@ -3,9 +3,9 @@
     <div class="row">
         <h2>
             {% if request.user.is_superuser %}
-            <div class="col-md-10 col-sm-8">
+            <div class="col-md-9 col-sm-6">
             {% else %}
-            <div class="col-md-12">
+            <div class="col-md-11 col-sm-10">
             {% endif %}
                 {% if storage == "C" %}
                 Refacciones en Consignación
@@ -16,6 +16,9 @@
                 {% else %}
                 Refacciones
                 {% endif %}
+            </div>
+            <div class="col-md-1 col-sm-2">
+                <p data-placement="top" data-toggle="tooltip" title="Realizar cotizacion de productos"><button type="button" class="btn btn-info btn-lg btn-block" data-toggle="modal" data-target="#pricing-list"><i class="fa fa-dollar"></i></button></p>
             </div>
             {% if request.user.is_superuser %}
             <div class="col-md-1 col-sm-2">
@@ -40,7 +43,9 @@
                     <th>Descripcion</th>
                     <th>Aplicacion</th>
                     <th>Precio</th>
-                    <th>Porcentaje</th>
+                    <th>Porcentaje 1</th>
+                    <th>Porcentaje 2</th>
+                    <th>Porcentaje 3</th>
                     {% if storage %}
                     <th>Cantidad</th>
                     {% if storage != "U" %}
@@ -63,7 +68,9 @@
                     <th>Descripcion</th>
                     <th>Aplicacion</th>
                     <th>Precio</th>
-                    <th>Porcentaje</th>
+                    <th>Porcentaje 1</th>
+                    <th>Porcentaje 2</th>
+                    <th>Porcentaje 3</th>
                     {% if storage %}
                     <th>Cantidad</th>
                     {% if storage != "U" %}
@@ -78,7 +85,7 @@
             </tfoot>
             <tbody>
                 {% for product in products %}
-                <tr id="{{ product.code }}" data-code="{{ product.code }}" data-brand="{{ product.brand.id }}" data-provider="{{ product.provider.id }}" data-name="{{ product.name }}" data-description="{{ product.description }}" data-price="{{ product.price }}" data-classification="{{ product.classification.id }}" data-appliance="{% for appliance in product.appliance.all %}{{ appliance.id }}:{% endfor %}">
+                <tr id="{{ product.code }}" data-code="{{ product.code }}" data-brand="{{ product.brand.id }}" data-provider="{{ product.provider.id }}" data-name="{{ product.name }}" data-description="{{ product.description }}" data-price="{{ product.price }}" data-appliance="{% for appliance in product.appliance.all %}{{ appliance.id }}:{% endfor %}">
                     <td><input type="checkbox" class="checkthis" value="{{ product.code }}" /></td>
                     <td>{{ product.code }}</td>
                     <td>{{ product.brand }}</td>
@@ -93,7 +100,9 @@
                         </ul>
                     </td>
                     <td>${{ product.real_price }}</td>
-                    <td>{{ product.classification }}</td>
+                    <td>${{ product.percentage_1 }}</td>
+                    <td>${{ product.percentage_2 }}</td>
+                    <td>${{ product.percentage_3 }}</td>
                     {% if storage == "C" %}
                     <td>{{ product.in_consignment }}</td>
                     {% elif storage == "S" %}
@@ -177,7 +186,7 @@
         <h4 class="modal-title custom_align">Actualizar producto</h4>
     </div>
     <div class="modal-body">
-        <iframe class="edit-iframe" src="about:blank"></iframe>
+        <iframe class="edit-iframe" src="about:blank" style="overflow: hidden;"></iframe>
     </div>
     <div class="modal-footer">
         <button type="submit" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-ok-sign"></span> Guardar</button>

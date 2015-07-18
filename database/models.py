@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.db import models
 # from lib.email_client import send_email
-import settings
 import os
 import shutil
 import datetime
@@ -47,6 +46,19 @@ class Classification(models.Model):
         products = Product.objects.filter(classification=self)
         return len(products)
 
+class Percentage(models.Model):
+    max_price_limit = models.DecimalField(max_digits=9, decimal_places=2)
+    percentage_1 = models.DecimalField(max_digits=9, decimal_places=2)
+    percentage_2 = models.DecimalField(max_digits=9, decimal_places=2)
+    percentage_3 = models.DecimalField(max_digits=9, decimal_places=2)
+
+    def __unicode__(self):
+        return self.max_price_limit
+
+    def products_related(self):
+        products = Product.objects.filter(percentage=self)
+        return len(products)
+
 class Tool(models.Model):
     code = models.CharField(max_length=30, primary_key=True)
     name = models.CharField(max_length=200)
@@ -68,10 +80,10 @@ class Product(models.Model):
     provider = models.ForeignKey(Provider, null=True, blank=True)
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=255, null=True, blank=True)
-    appliance = models.ManyToManyField(Appliance, null=True, blank=True)
+    appliance = models.ManyToManyField(Appliance, blank=True)
     price = models.DecimalField(max_digits=9, decimal_places=2)
     discount = models.DecimalField(max_digits=9, decimal_places=2)
-    classification = models.ForeignKey(Classification, null=True, blank=True)
+    #classification = models.ForeignKey(Classification, null=True, blank=True)
     in_used = models.IntegerField()
     in_stock = models.IntegerField()
     in_consignment = models.IntegerField()
@@ -83,6 +95,7 @@ class Product(models.Model):
 
 class Input(models.Model):
     date = models.DateTimeField()
+    invoice_number = models.CharField(max_length=30, null=True, blank=True)
     storage = models.CharField(max_length=1, choices=Product.STORAGE_CHOICES)
 
     def __init__(self, *args, **kwargs):
@@ -180,12 +193,12 @@ admin.site.register(Input, InputAdmin)
 
 class BackupManager(object):
 
-    #DIRECTORY = os.path.join(os.getcwd(), "backups") if settings.DEBUG else "C:\\MODB\\backups/"
+    #DIRECTORY = os.path.join(os.getcwd(), "backups")# if settings.DEBUG else "C:\\MODB\\backups/"
     DIRECTORY = "C:\\MODB\\backups/"
 
     def get_current_db(self):
         #if settings.DEBUG:
-        #    return os.path.join(os.getcwd(), "db.sqlite3")
+        #return os.path.join(os.getcwd(), "db.sqlite3")
         #else:
         return "C:\\MODB\\db.sqlite3"
 

@@ -183,7 +183,7 @@ $('table#outputs').DataTable().columns().every( function () {
     $( 'input', this.footer() ).on( 'keyup change', function () {
         that.search( this.value ).draw();
     } );
-} );
+});
 
 
 
@@ -201,7 +201,7 @@ $('#multi-email').click(function() {
 			totalSum += parseFloat(row.find('.product-total').text().substring(1))
 		}
 	});
-	$(".total-sum").text("$"+totalSum);
+	$(".total-sum").text("$"+totalSum.toFixed(2));
 	var emailList = $('table#email-list')
 	if (!emailList.hasClass("dataTable")){
 		emailList.dataTable({
@@ -213,6 +213,9 @@ $('#multi-email').click(function() {
 		        'bSortable' : false,
 		        'aTargets' : [ 0, -1, -2 ]
 		    } ],
+		});
+		$("#email-list_wrapper thead tr input").each(function () {
+			$(this).attr("checked", true)
 		});
 	}
 });

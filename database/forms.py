@@ -8,7 +8,7 @@ from django.utils.html import conditional_escape, format_html
 from django.forms.utils import flatatt
 from django.utils.safestring import mark_safe
 
-from models import Product, Tool, Provider, Appliance, Classification, Brand, Lending, Input_Product, Output_Product, Lending_Product, Configuration, BackupManager
+from models import Product, Tool, Provider, Appliance, Brand, Lending, Input_Product, Output_Product, Lending_Product, Configuration, BackupManager, Percentage
 
 from datetime import datetime
 
@@ -47,8 +47,6 @@ class Datalist(forms.widgets.Select):
                 final_attrs["value"] = Brand.objects.get(id=value).name
             elif name == "provider":
                 final_attrs["value"] = Provider.objects.get(id=value).name
-            elif name == "classification":
-                final_attrs["value"] = Classification.objects.get(id=value).name
         output = [format_html('<input{} />', flatatt(final_attrs)), format_html('<datalist{}>', flatatt(datalist_attrs))]
         options = self.render_options(choices, [value])
         if options:
@@ -75,7 +73,6 @@ class ProductForm(forms.ModelForm):
     price = forms.DecimalField(max_digits=9, decimal_places=2, label='Precio de lista', required=True, min_value=0, initial=0)
     discount = forms.DecimalField(max_digits=9, decimal_places=2, label='Descuento', required=False, initial=0, min_value=0, max_value=100)
     real_price = forms.DecimalField(max_digits=9, decimal_places=2, label='Precio real', required=False, initial=0, min_value=0, widget=forms.widgets.NumberInput(attrs={'disabled':'disabled'}))
-    classification = forms.ModelChoiceField(queryset=Classification.objects.all(), required=False, label="Porcentaje", widget=Datalist())
     in_used = forms.IntegerField(label='Obsoletas', initial=0, min_value=0)
     in_stock = forms.IntegerField(label='Propias', initial=0, min_value=0)
     stock_tobe = forms.IntegerField(label='Stock propias', initial=0, min_value=0)
@@ -94,7 +91,6 @@ class ProductForm(forms.ModelForm):
             "price",
             "discount",
             "real_price",
-            "classification",
             "in_used",
             "in_stock",
             "stock_tobe",
@@ -115,6 +111,7 @@ class ToolForm(forms.ModelForm):
 
 class ProductInputForm(forms.ModelForm):
     date = forms.DateField(widget=DateInput(), label='Fecha', initial=datetime.now())
+    invoice_number = forms.CharField(max_length=100, label='Numero de Factura', required=False)
     filter_search = forms.CharField(max_length=100, label='Buscar producto')
     product = forms.ModelMultipleChoiceField(queryset=Product.objects.all(), required=False, label="Seleccionar productos", widget=ProductSelect(attrs={"size":"10"}))
     amount = forms.IntegerField(label='Cantidad', initial=1)
@@ -124,7 +121,7 @@ class ProductInputForm(forms.ModelForm):
 
     class Meta:
         model = Input_Product
-        fields = ['date', 'storage', 'provider', 'filter_search', 'product', 'amount', 'price']
+        fields = ['date', 'invoice_number', 'storage', 'provider', 'filter_search', 'product', 'amount', 'price']
 
 class ProductOutputForm(forms.ModelForm):
     date = forms.DateField(widget=DateInput(), label='Fecha', initial=datetime.now())
@@ -215,19 +212,26 @@ class UpdateApplianceForm(forms.ModelForm):
         model = Appliance
         fields = "__all__"
 
-class ClassificationForm(forms.ModelForm):
-    name = forms.CharField(max_length=100, label='Nombre')
+
+class PercentageForm(forms.ModelForm):
+    max_price_limit = forms.DecimalField(max_digits=9, decimal_places=2, label='Precio maximo', required=True, min_value=0)
+    percentage_1 = forms.DecimalField(max_digits=9, decimal_places=2, label='Porcentaje 1', required=True, min_value=0)
+    percentage_2 = forms.DecimalField(max_digits=9, decimal_places=2, label='Porcentaje 2', required=True, min_value=0)
+    percentage_3 = forms.DecimalField(max_digits=9, decimal_places=2, label='Porcentaje 3', required=True, min_value=0)
 
     class Meta:
-        model = Classification
+        model = Percentage
         fields = "__all__"
 
-class UpdateClassificationForm(forms.ModelForm):
+class UpdatePercentageForm(forms.ModelForm):
     id = forms.IntegerField(widget = forms.HiddenInput)
-    name = forms.CharField(max_length=100, label='Nombre')
+    max_price_limit = forms.DecimalField(max_digits=9, decimal_places=2, label='Precio maximo', required=True, min_value=0)
+    percentage_1 = forms.DecimalField(max_digits=9, decimal_places=2, label='Porcentaje 1', required=True, min_value=0)
+    percentage_2 = forms.DecimalField(max_digits=9, decimal_places=2, label='Porcentaje 2', required=True, min_value=0)
+    percentage_3 = forms.DecimalField(max_digits=9, decimal_places=2, label='Porcentaje 3', required=True, min_value=0)
 
     class Meta:
-        model = Classification
+        model = Percentage
         fields = "__all__" 
 
 class ConfigurationForm(forms.ModelForm):
@@ -243,11 +247,12 @@ class ConfigurationForm(forms.ModelForm):
 
 class OrderInputForm(forms.ModelForm):
     date = forms.DateField(widget=DateInput(), label='Fecha', initial=datetime.now())
+    invoice_number = forms.CharField(max_length=100, label='Numero de Factura', required=False)
     storage = forms.ChoiceField(label='Almacen', choices=Product.STORAGE_CHOICES)
 
     class Meta:
         model = Input_Product
-        fields = ['date', 'storage']
+        fields = ['date', 'invoice_number', 'storage']
 
 class BackupForm(forms.Form):
 

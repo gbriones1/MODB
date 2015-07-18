@@ -130,3 +130,74 @@ function getDiscount () {
 	}
 	return parseFloat(discount)
 }
+
+
+$('table#inputs tfoot th').each( function () {
+    var title = $('table#inputs thead th').eq( $(this).index() ).text();
+    if (title != '' && title != "Eliminar"){
+    	$(this).html( '<input type="text" placeholder="Buscar '+title+'" class="form-control" />' );
+    }
+    else{
+    	$(this).html( '<input style="display: none;" type="text" placeholder="Buscar '+title+'" class="form-control" />' );
+    }
+} );
+
+$('table#inputs').dataTable({
+    "sScrollY": ($(window).height()-450)+"px",
+    "sScrollX": "98%",
+    "bScrollCollapse": true,
+    "bPaginate": false,
+    "sDom": '<"top">rt<"bottom"lp><"clear">',
+    "aoColumnDefs" : [ {
+        'bSortable' : false,
+        'aTargets' : [ 0, -1, -2 ]
+    } ],
+    "aaSorting": [[1,'asc']]
+});
+
+$('table#inputs').DataTable().columns().every( function () {
+    var that = this;
+    $( 'input', this.footer() ).on( 'keyup change', function () {
+        that.search( this.value ).draw();
+    } );
+});
+
+$('#multi-email').click(function() {
+	var emailListTable = $('#email-list tbody');
+	var totalSum = 0;
+	emailListTable.empty()
+	$("table#inputs tbody tr").each(function () {
+		if ($(this).find(".checkthis").is(":checked")){
+			var row = $(this).clone();
+			row.find(":first-child").remove();
+			row.find(":last-child").remove();
+			emailListTable.append(row);
+			totalSum += parseFloat(row.find('.product-total').text().substring(1))
+		}
+	});
+	$(".total-sum").text("$"+totalSum.toFixed(2));
+	var emailList = $('table#email-list')
+	if (!emailList.hasClass("dataTable")){
+		emailList.dataTable({
+		    "sScrollX": "98%",
+		    "bScrollCollapse": true,
+		    "bPaginate": false,
+		    "sDom": '<"top">rt<"bottom"lp><"clear">',
+		    "aoColumnDefs" : [ {
+		        'bSortable' : false,
+		        'aTargets' : [ 0, -1, -2 ]
+		    } ],
+		});
+		$("#email-list_wrapper thead tr input").each(function () {
+			$(this).attr("checked", true)
+		});
+	}
+});
+
+$("#multi-email-form").submit(function () {
+	var inputProducts = [];
+	$('#email-list tbody tr').each(function () {
+		inputProducts.push($(this).attr("data-id"));
+	});
+	$('input[name="product_input_id"]').val(JSON.stringify(inputProducts))
+});

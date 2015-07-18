@@ -4,8 +4,8 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.views.decorators.cache import never_cache
-from database.models import Product, Tool, Input, Output, Lending, Input_Product, Output_Product, Lending_Product, Lending_Tool, Provider, Appliance, Classification, Brand, Order, Configuration, Order_Product, BackupManager
-from database.forms import ProductForm, ToolForm, ProductInputForm, ProductOutputForm, ProductLendingForm, ToolLendingForm, ProviderForm, ApplianceForm, BrandForm, ClassificationForm, UpdateProviderForm, UpdateBrandForm, UpdateApplianceForm, UpdateClassificationForm, ConfigurationForm, OrderInputForm, BackupForm
+from database.models import Product, Tool, Input, Output, Lending, Input_Product, Output_Product, Lending_Product, Lending_Tool, Provider, Appliance, Brand, Order, Configuration, Order_Product, BackupManager, Percentage
+from database.forms import ProductForm, ToolForm, ProductInputForm, ProductOutputForm, ProductLendingForm, ToolLendingForm, ProviderForm, ApplianceForm, BrandForm, UpdateProviderForm, UpdateBrandForm, UpdateApplianceForm, ConfigurationForm, OrderInputForm, BackupForm, PercentageForm, UpdatePercentageForm
 from lib.email_client import send_email
 from datetime import datetime
 import calendar
@@ -62,7 +62,6 @@ def dashboard(request):
     products = Product.objects.all()
     providers = Provider.objects.all()
     brands = Brand.objects.all()
-    classifications = Classification.objects.all()
     appliances = Appliance.objects.all()
     if request.method == "POST":
         action = request.POST.get('action', '')
@@ -70,7 +69,6 @@ def dashboard(request):
             data = request.POST.copy()
             query_brand = Brand.objects.filter(name=data["brand"])
             query_provider = Provider.objects.filter(name=data["provider"])
-            query_classification = Classification.objects.filter(name=data["classification"])
             if query_brand:
                 data["brand"] = query_brand[0].id
             else:
@@ -83,12 +81,6 @@ def dashboard(request):
                 provider = Provider(name=data["provider"])
                 provider.save()
                 data["provider"] = provider.id
-            if query_classification:
-                data["classification"] = query_classification[0].id
-            else:
-                classification = Classification(name=data["classification"])
-                classification.save()
-                data["classification"] = classification.id
             form = ProductForm(data)
             if form.is_valid():
                 form.save()
@@ -99,7 +91,6 @@ def dashboard(request):
             data = request.POST.copy()
             query_brand = Brand.objects.filter(name=data["brand"])
             query_provider = Provider.objects.filter(name=data["provider"])
-            query_classification = Classification.objects.filter(name=data["classification"])
             if query_brand:
                 data["brand"] = query_brand[0].id
             else:
@@ -112,12 +103,6 @@ def dashboard(request):
                 provider = Provider(name=data["provider"])
                 provider.save()
                 data["provider"] = provider.id
-            if query_classification:
-                data["classification"] = query_classification[0].id
-            else:
-                classification = Classification(name=data["classification"])
-                classification.save()
-                data["classification"] = classification.id
             form = ProductForm(data, instance=product)
             if form.is_valid():
                 form.save()
@@ -126,65 +111,6 @@ def dashboard(request):
         elif action == "DELETE":
             for product in Product.objects.filter(code__in=json.loads(str(request.POST.get('code',"[]")))):
                 product.delete()
-        # elif action == "INPUT":
-        #     product_amount = json.loads(request.POST.get("inputProducts", "{}"))
-        #     storage = request.POST.get("storage", "")
-        #     if product_amount and storage:
-        #         new_input = Input(storage=storage)
-        #         new_input.save()
-        #         for productId, amount in product_amount.iteritems():
-        #             product = Product.objects.get(code=productId)
-        #             product_input = Input_Product(product=product, amount=amount, input_reg=new_input)
-        #             if storage == "C":
-        #                 product.in_consignment += int(amount)
-        #             elif storage == "S":
-        #                 product.in_stock += int(amount)
-        #             elif storage == "U":
-        #                 product.in_used += int(amount)
-        #             product_input.save()
-        #             product.save()
-        #     else:
-        #         set_messages(request, [("Entrada no autorizada, los datos no fueron validos", "danger")])
-        # elif action == "OUTPUT":
-        #     product_amount = json.loads(request.POST.get("outputProducts", "{}"))
-        #     storage = request.POST.get("storage", "")
-        #     if product_amount and storage:
-        #         new_output = Output(storage=storage)
-        #         new_output.save()
-        #         for productId, amount in product_amount.iteritems():
-        #             product = Product.objects.get(code=productId)
-        #             product_output = Output_Product(product=product, amount=amount, output_reg=new_output)
-        #             if storage == "C":
-        #                 product.in_consignment -= int(amount)
-        #             elif storage == "S":
-        #                 product.in_stock -= int(amount)
-        #             elif storage == "U":
-        #                 product.in_used -= int(amount)
-        #             product_output.save()
-        #             product.save()
-        #     else:
-        #         set_messages(request, [("Salida no autorizada, los datos no fueron validos", "danger")])
-        # elif action == "LENDING":
-        #     product_amount = json.loads(request.POST.get("lendingProducts", "{}"))
-        #     storage = request.POST.get("storage", "")
-        #     employee = request.POST.get("employee", "")
-        #     destination = request.POST.get("destination", "")
-        #     if product_amount and storage and employee and destination:
-        #         lending = Lending(storage=storage, employee=employee, destination=destination)
-        #         lending.save()
-        #         for productId, amount in product_amount.iteritems():
-        #             product = Product.objects.get(code=productId)
-        #             product_lending = Lending_Product(product=product, amount=amount, lending=lending)
-        #             if storage == "C":
-        #                 product.in_consignment -= int(amount)
-        #             elif storage == "S":
-        #                 product.in_stock -= int(amount)
-        #             elif storage == "U":
-        #                 product.in_used -= int(amount)
-        #             product_lending.save()
-        #             product.save()
-        #     else:
-        #         set_messages(request, [("Prestamo no autorizado, los datos no fueron validos", "danger")])
         redirect_url = "/"
         storage = request.POST.get('storage', '')
         if storage:
@@ -211,7 +137,12 @@ def dashboard(request):
         products = products.order_by(sort)
     for product in products:
         product.real_price = float("%.2f" % float(product.price-product.price*product.discount/100))
-    # product_forms = {p.code:ProductForm(instance=p) for p in products}
+        product.percentage_1 = product.percentage_2 = product.percentage_3 = product.real_price
+        percentage = Percentage.objects.filter(max_price_limit__gt=product.real_price).order_by("max_price_limit")
+        if percentage:
+            product.percentage_1 = product.real_price+product.real_price*float(percentage[0].percentage_1)/100
+            product.percentage_2 = product.real_price+product.real_price*float(percentage[0].percentage_2)/100
+            product.percentage_3 = product.real_price+product.real_price*float(percentage[0].percentage_3)/100
     scripts = ["product"]
     messages = get_messages(request)
     return render_to_response('pages/dashboard.html', locals(), context_instance=RequestContext(request))
@@ -433,6 +364,7 @@ def inputs(request):
         if action == "CREATE":
             product_amount = json.loads(request.POST.get("inputProducts", "{}"))
             storage = request.POST.get("storage", "")
+            invoice_number = request.POST.get("invoice_number", None)
             date = datetime.strptime(request.POST.get("date", now.strftime("%Y-%m-%d")), "%Y-%m-%d").date()
             if product_amount and storage:
                 updated_products = []
@@ -447,7 +379,7 @@ def inputs(request):
                         product.save()
                         updated_products.append(product.code+"-"+product.name+"-"+product.description+" a: $"+str(price)+" con "+str(discount)+"%")
                         messages.append(("El producto "+product.code+" - "+product.name+" cambio su precio a: $"+str(price)+" y descuento del "+str(discount)+"%", "success"))
-                new_input = Input(storage=storage, date=date)
+                new_input = Input(storage=storage, date=date, invoice_number=invoice_number)
                 new_input.save()
                 for productId, definition in product_amount.iteritems():
                     amount = definition["amount"]
@@ -484,6 +416,47 @@ def inputs(request):
                         product.save()
                     product_input.delete()
                 delete_input.delete()
+        elif action == "MULTIEMAIL":
+            messages = []
+            product_input_ids = json.loads(str(request.POST.get('product_input_id', "[]")))
+            destination = request.POST.get("destination", "")
+            if not product_input_ids:
+                messages.append(("Ninguna salida seleccionada.", "warning"))
+            if not destination:
+                messages.append(("Ningun email seleccionado.", "warning"))
+            if not messages:
+                product_inputs = Input_Product.objects.filter(id__in=product_input_ids)
+                email_text = ""
+                total_sum = 0
+                for product_input in product_inputs:
+                    if request.POST.get("dateColumn", ""):
+                        email_text += product_input.input_reg.date.strftime("%Y-%m-%d")+"\t"
+                    if request.POST.get("codeColumn"):
+                        email_text += product_input.product.code+"\t"
+                    if request.POST.get("brandColumn"):
+                        email_text += product_input.product.brand.name+"\t"
+                    if request.POST.get("providerColumn"):
+                        email_text += product_input.product.provider.name+"\t"
+                    if request.POST.get("nameColumn"):
+                        email_text += product_input.product.name+"\t"
+                    if request.POST.get("amountColumn"):
+                        email_text += str(product_input.amount)+"\t"
+                    if request.POST.get("silglePriceColumn"):
+                        email_text += "$"+str(product_input.product.price)+"\t"
+                    if request.POST.get("totalPriceColumn"):
+                        total_sum += float(product_input.product.price*product_input.amount)
+                        email_text += "$"+str(product_input.product.price*product_input.amount)+"\t"
+                    if request.POST.get("storageColumn"):
+                        email_text += product_input.input_reg.get_storage_display()+"\t"
+                    email_text += "\n"
+                email_text += "\n"
+                if request.POST.get("totalPriceColumn"):
+                    email_text += "Total:\t$"+str(total_sum)
+                if not send_email(destination, "Reporte de entrada", email_text):
+                    messages.append(("Correo de registro de entrada no enviado, correo no valido", "warning"))
+            else:
+                messages.append(("Seleccion de entradas no enviada.", "error"))
+            set_messages(request, messages)
         return HttpResponseRedirect('/inputs/?start_date='+formatted_start_date+"&end_date="+formatted_end_date)
     form = ProductInputForm()
     scripts = ['productInput']
@@ -713,32 +686,32 @@ def appliances(request):
     return render_to_response('pages/dashboard.html', locals(), context_instance=RequestContext(request))
 
 @login_required
-def classifications(request):
+def percentages(request):
     dashboard_active = "active"
-    classifications_active = "active"
-    classifications = Classification.objects.all().order_by("name")
+    percentages_active = "active"
+    percentages = Percentage.objects.all().order_by("max_price_limit")
     if request.method == "POST":
         action = request.POST.get('action', '')
         if action == "CREATE":
-            form = ClassificationForm(request.POST)
+            form = PercentageForm(request.POST)
             if form.is_valid():
                 form.save()
             else:
-                set_messages(request, [("Clasificacion no agregada, los datos no fueron validos", "danger")])
+                set_messages(request, [("Porcentaje no agregada, los datos no fueron validos", "danger")])
         elif action == "UPDATE":
-            classification = Classification.objects.get(id=request.POST['id'])
-            form = ClassificationForm(request.POST, instance=classification)
+            percentage = Percentage.objects.get(id=request.POST['id'])
+            form = PercentageForm(request.POST, instance=percentage)
             if form.is_valid():
                 form.save()
             else:
-                set_messages(request, [("Clasificacion no actualizada, los nuevos datos no son validos", "danger")])
+                set_messages(request, [("Porcentaje no actualizada, los nuevos datos no son validos", "danger")])
         elif action == "DELETE":
-            for classification in Classification.objects.filter(id__in=json.loads(str(request.POST.get('classification_id',"[]")))):
-                classification.delete()
-        return HttpResponseRedirect('/classifications/')
-    form = ClassificationForm()
-    classification_forms = {c.id:UpdateClassificationForm(instance=c) for c in classifications}
-    scripts = ["classification"]
+            for percentage in Percentage.objects.filter(id__in=json.loads(str(request.POST.get('percentage_id',"[]")))):
+                percentage.delete()
+        return HttpResponseRedirect('/percentages/')
+    form = PercentageForm()
+    percentage_forms = {p.id:UpdatePercentageForm(instance=p) for p in percentages}
+    scripts = ["percentage"]
     messages = get_messages(request)
     return render_to_response('pages/dashboard.html', locals(), context_instance=RequestContext(request))
 
@@ -951,21 +924,23 @@ def shopping(request):
                 product_amount = {}
                 for order_product in order.order_product_set.all():
                     code = order_product.product.code
-                    product_amount[code] = {"amount":request.POST.get(code, "0"), "price":request.POST.get("price"+code, "0")}
+                    product_amount[code] = {"amount":request.POST.get(code, "0"), "price":request.POST.get("price"+code, "0"), "discount":request.POST.get("discount"+code, "0")}
                 storage = request.POST.get("storage", "")
+                invoice_number = request.POST.get("invoice_number", None)
                 if product_amount and storage:
                     is_valid = True
                     messages = []
                     for productId, definition in product_amount.iteritems():
                         amount = definition["amount"]
                         price = float(definition["price"])
+                        discount = float(definition["discount"])
                         product = Product.objects.get(code=productId)
                         product_real_price = float("%.2f" % float(product.price-product.price*product.discount/100))
-                        if product_real_price != price:
+                        if float("%.2f" % float(product.price)) != price or float("%.2f" % float(product.discount)) != discount:
                             is_valid = False
-                            messages.append(("El producto "+product.code+" - "+product.name+" a: $"+str(product_real_price)+" no coincide con el precio ingresado: $"+str(price), "danger"))
+                            messages.append(("El producto "+product.code+" - "+product.name+" a: $"+str(product_real_price)+" no coincide con el precio ingresado: $"+str(price-price*discount/100), "danger"))
                     if is_valid:
-                        new_input = Input(storage=storage, date=now)
+                        new_input = Input(storage=storage, date=now, invoice_number=invoice_number)
                         new_input.save()
                         for productId, definition in product_amount.iteritems():
                             amount = definition["amount"]

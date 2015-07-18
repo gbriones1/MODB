@@ -230,7 +230,7 @@ $('.edit-iframe').load(function () {
 		calculateRealPrice($('.edit-iframe').contents().find('form'));
 	});
 	$('#edit').on('shown.bs.modal', function (e) {
-		$('.edit-iframe').height($('.edit-iframe').contents().find('html').height());
+		$('.edit-iframe').height($('.edit-iframe').contents().find('html').height()+20);
 	});
 	$('.edit-iframe').height($('.edit-iframe').contents().find('html').height());
 });
