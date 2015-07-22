@@ -8,7 +8,7 @@ from django.utils.html import conditional_escape, format_html
 from django.forms.utils import flatatt
 from django.utils.safestring import mark_safe
 
-from models import Product, Tool, Provider, Appliance, Brand, Lending, Input_Product, Output_Product, Lending_Product, Configuration, BackupManager, Percentage
+from models import Product, Tool, Provider, Appliance, Brand, Lending, Input_Product, Output_Product, Lending_Product, Configuration, BackupManager, Percentage, Organization
 
 from datetime import datetime
 
@@ -127,6 +127,7 @@ class ProductOutputForm(forms.ModelForm):
     date = forms.DateField(widget=DateInput(), label='Fecha', initial=datetime.now())
     employee = forms.CharField(max_length=100, label='Empleado')
     destination = forms.CharField(max_length=100, label='Destino')
+    organization = forms.ModelChoiceField(queryset=Organization.objects.all(), required=False, label="Organizacion")
     filter_search = forms.CharField(max_length=100, label='Buscar producto')
     product_consignment = forms.ModelMultipleChoiceField(queryset=Product.objects.filter(in_consignment__gt=0), required=False, label="Seleccionar productos", widget=ProductSelect(attrs={"size":"10"}))
     product_stock = forms.ModelMultipleChoiceField(queryset=Product.objects.filter(in_stock__gt=0), required=False, label="Seleccionar productos", widget=ProductSelect(attrs={"size":"10"}))
@@ -137,7 +138,7 @@ class ProductOutputForm(forms.ModelForm):
 
     class Meta:
         model = Output_Product
-        fields = ['date', 'employee', 'destination', 'storage', 'provider', 'filter_search', 'product_consignment', 'product_stock', 'product_used', 'amount']
+        fields = ['date', 'employee', 'destination', 'organization', 'storage', 'provider', 'filter_search', 'product_consignment', 'product_stock', 'product_used', 'amount']
 
 class ProductLendingForm(forms.ModelForm):
     date = forms.DateField(widget=DateInput(), label='Fecha', initial=datetime.now())
@@ -195,6 +196,21 @@ class UpdateBrandForm(forms.ModelForm):
 
     class Meta:
         model = Brand
+        fields = "__all__"
+
+class OrganizationForm(forms.ModelForm):
+    name = forms.CharField(max_length=100, label='Nombre')
+
+    class Meta:
+        model = Organization
+        fields = "__all__"
+
+class UpdateOrganizationForm(forms.ModelForm):
+    id = forms.IntegerField(widget = forms.HiddenInput)
+    name = forms.CharField(max_length=100, label='Nombre')
+
+    class Meta:
+        model = Organization
         fields = "__all__" 
 
 class ApplianceForm(forms.ModelForm):

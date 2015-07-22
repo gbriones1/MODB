@@ -45,6 +45,9 @@
 	{% if percentages_active %}
 	{% include 'sections/percentageTable.html' %}
 	{% endif %}
+	{% if organizations_active %}
+	{% include 'sections/organizationTable.html' %}
+	{% endif %}
 	{% if registry_active %}
 	{% include 'sections/registryTable.html' %}
 	{% endif %}

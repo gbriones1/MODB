@@ -4,8 +4,8 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.views.decorators.cache import never_cache
-from database.models import Product, Tool, Input, Output, Lending, Input_Product, Output_Product, Lending_Product, Lending_Tool, Provider, Appliance, Brand, Order, Configuration, Order_Product, BackupManager, Percentage
-from database.forms import ProductForm, ToolForm, ProductInputForm, ProductOutputForm, ProductLendingForm, ToolLendingForm, ProviderForm, ApplianceForm, BrandForm, UpdateProviderForm, UpdateBrandForm, UpdateApplianceForm, ConfigurationForm, OrderInputForm, BackupForm, PercentageForm, UpdatePercentageForm
+from database.models import Product, Tool, Input, Output, Lending, Input_Product, Output_Product, Lending_Product, Lending_Tool, Provider, Appliance, Brand, Order, Configuration, Order_Product, BackupManager, Percentage, Organization
+from database.forms import ProductForm, ToolForm, ProductInputForm, ProductOutputForm, ProductLendingForm, ToolLendingForm, ProviderForm, ApplianceForm, BrandForm, UpdateProviderForm, UpdateBrandForm, UpdateApplianceForm, ConfigurationForm, OrderInputForm, BackupForm, PercentageForm, UpdatePercentageForm, OrganizationForm, UpdateOrganizationForm
 from lib.email_client import send_email
 from datetime import datetime
 import calendar
@@ -488,7 +488,8 @@ def outputs(request):
             storage = request.POST.get("storage", "")
             date = datetime.strptime(request.POST.get("date", now.strftime("%Y-%m-%d")), "%Y-%m-%d").date()
             if product_amount and storage:
-                new_output = Output(storage=storage, date=date, employee=request.POST.get("employee", ""), destination=request.POST.get("destination", ""))
+                organization = Organization.objects.get(id=request.POST.get("organization", ""))
+                new_output = Output(storage=storage, date=date, employee=request.POST.get("employee", ""), destination=request.POST.get("destination", ""), organization=organization)
                 new_output.save()
                 for productId, amount in product_amount.iteritems():
                     product = Product.objects.get(code=productId)
@@ -712,6 +713,36 @@ def percentages(request):
     form = PercentageForm()
     percentage_forms = {p.id:UpdatePercentageForm(instance=p) for p in percentages}
     scripts = ["percentage"]
+    messages = get_messages(request)
+    return render_to_response('pages/dashboard.html', locals(), context_instance=RequestContext(request))
+
+@login_required
+def organizations(request):
+    dashboard_active = "active"
+    organizations_active = "active"
+    organizations = Organization.objects.all().order_by("name")
+    if request.method == "POST":
+        action = request.POST.get('action', '')
+        if action == "CREATE":
+            form = OrganizationForm(request.POST)
+            if form.is_valid():
+                form.save()
+            else:
+                set_messages(request, [("Organizacion no agregada, los datos no fueron validos", "danger")])
+        elif action == "UPDATE":
+            organization = Organization.objects.get(id=request.POST['id'])
+            form = OrganizationForm(request.POST, instance=organization)
+            if form.is_valid():
+                form.save()
+            else:
+                set_messages(request, [("Organizacion no actualizada, los nuevos datos no son validos", "danger")])
+        elif action == "DELETE":
+            for organization in Organization.objects.filter(id__in=json.loads(str(request.POST.get('brand_id',"[]")))):
+                organization.delete()
+        return HttpResponseRedirect('/organizations/')
+    form = OrganizationForm()
+    organization_forms = {o.id:UpdateOrganizationForm(instance=o) for o in organizations}
+    scripts = ["organization"]
     messages = get_messages(request)
     return render_to_response('pages/dashboard.html', locals(), context_instance=RequestContext(request))
 

@@ -102,10 +102,17 @@ class Input(models.Model):
         super(Input, self).__init__(*args, **kwargs)
         self.type = "Input"
 
+class Organization(models.Model):
+    name = models.CharField(max_length=200)
+    
+    def __unicode__(self):
+        return self.name
+
 class Output(models.Model):
     date = models.DateTimeField()
     employee = models.CharField(max_length=100)
     destination = models.CharField(max_length=100)
+    organization = models.ForeignKey(Organization, null=True, blank=True)
     storage = models.CharField(max_length=1, choices=Product.STORAGE_CHOICES)
 
     def __init__(self, *args, **kwargs):
