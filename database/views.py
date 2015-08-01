@@ -43,10 +43,13 @@ def createOrder(provider, products, subject, message, request):
         for product in products:
             message += "\n"+product.code+" - "+product.name+" "+product.description+". Cantidad: "+request.POST.get(product.code, "0")
         if send_email(provider.email, subject, message):
-            order = Order(provider=provider, status=Order.STATUS_ASKED)
+            order = Order(provider=provider)
             order.save()
             for product in products:
-                product_order = Order_Product(product=product, amount=int(request.POST.get(product.code, "0")), order=order)
+                organization_id = request.POST.get("organization"+product.code, "")
+                organization = Organization.objects.get(id=organization_id) if organization_id else None
+                storage = request.POST.get("storage"+product.code, None)
+                product_order = Order_Product(product=product, amount=int(request.POST.get(product.code, "0")), order=order, organization=organization, storage=storage, status=Order.STATUS_ASKED)
                 product_order.save()
         else:
             add_message(request, ("Email no valido. Orden no enviada", "warning"))
@@ -488,7 +491,9 @@ def outputs(request):
             storage = request.POST.get("storage", "")
             date = datetime.strptime(request.POST.get("date", now.strftime("%Y-%m-%d")), "%Y-%m-%d").date()
             if product_amount and storage:
-                organization = Organization.objects.get(id=request.POST.get("organization", ""))
+                organization = None
+                if request.POST.get("organization", ""):
+                    organization = Organization.objects.get(id=request.POST.get("organization", ""))
                 new_output = Output(storage=storage, date=date, employee=request.POST.get("employee", ""), destination=request.POST.get("destination", ""), organization=organization)
                 new_output.save()
                 for productId, amount in product_amount.iteritems():
@@ -951,49 +956,31 @@ def shopping(request):
             else:
                 set_messages(request, [("Ningun producto pedido. Orden no enviada", "warning")])
         if action == "INPUT":
-            for order in Order.objects.filter(id__in=json.loads(str(request.POST.get('order_id', "[]")))):
-                product_amount = {}
-                for order_product in order.order_product_set.all():
-                    code = order_product.product.code
-                    product_amount[code] = {"amount":request.POST.get(code, "0"), "price":request.POST.get("price"+code, "0"), "discount":request.POST.get("discount"+code, "0")}
+            for order_product in Order_Product.objects.filter(id__in=json.loads(str(request.POST.get('order_product_id', "[]")))):
                 storage = request.POST.get("storage", "")
                 invoice_number = request.POST.get("invoice_number", None)
-                if product_amount and storage:
-                    is_valid = True
-                    messages = []
-                    for productId, definition in product_amount.iteritems():
-                        amount = definition["amount"]
-                        price = float(definition["price"])
-                        discount = float(definition["discount"])
-                        product = Product.objects.get(code=productId)
-                        product_real_price = float("%.2f" % float(product.price-product.price*product.discount/100))
-                        if float("%.2f" % float(product.price)) != price or float("%.2f" % float(product.discount)) != discount:
-                            is_valid = False
-                            messages.append(("El producto "+product.code+" - "+product.name+" a: $"+str(product_real_price)+" no coincide con el precio ingresado: $"+str(price-price*discount/100), "danger"))
-                    if is_valid:
-                        new_input = Input(storage=storage, date=now, invoice_number=invoice_number)
-                        new_input.save()
-                        for productId, definition in product_amount.iteritems():
-                            amount = definition["amount"]
-                            product = Product.objects.get(code=productId)
-                            product_input = Input_Product(product=product, amount=amount, price=float(product.price-product.price*product.discount/100), input_reg=new_input)
-                            if storage == "C":
-                                product.in_consignment += int(amount)
-                            elif storage == "S":
-                                product.in_stock += int(amount)
-                            elif storage == "U":
-                                product.in_used += int(amount)
-                            product_input.save()
-                            product.save()
-                        order.status = Order.STATUS_RECEIVED
-                        order.received_date = now
-                        order.save()
-                    else:
-                        conf = Configuration.objects.all()[0]
-                        if conf.mailOnPriceChange:
-                            if not conf.receiver_email or not send_email(conf.receiver_email, "BDMO Entrada con precios erroneos", "Entrada no autorizada del "+str(now)+" por las siguientes razones:\n"+"\n".join([x[0] for x in messages])):
-                                messages.append(("Correo de notificacion de precio diferente no enviado, correo no valido", "warning"))
-                    set_messages(request, messages)
+                price = float(request.POST.get("price", "0"))
+                discount = float(request.POST.get("discount", "0"))
+                amount = int(request.POST.get("amount", "0"))
+                product = order_product.product
+                product.price = price
+                product.discount = discount
+                product.save()
+                if storage and amount:
+                    new_input = Input(storage=storage, date=now, invoice_number=invoice_number)
+                    new_input.save()
+                    product_input = Input_Product(product=product, amount=amount, price=float(product.price-product.price*product.discount/100), input_reg=new_input)
+                    if storage == "C":
+                        product.in_consignment += int(amount)
+                    elif storage == "S":
+                        product.in_stock += int(amount)
+                    elif storage == "U":
+                        product.in_used += int(amount)
+                    product_input.save()
+                    product.save()
+                    order_product.status = Order.STATUS_RECEIVED
+                    order_product.received_date = now
+                    order_product.save()
                 else:
                     set_messages(request, [("Entrada no autorizada, los datos no fueron validos", "danger")])
         if action == "RESEND":
@@ -1009,25 +996,33 @@ def shopping(request):
                         else:
                             order_product.delete()
                     if send_email(order.provider.email, request.POST.get("subject", ""), message):
-                        order.status = Order.STATUS_ASKED
-                        order.save()
+                        for order_product in order.order_product_set.all():
+                            order_product.status = Order.STATUS_ASKED
+                            order_product.save()
                     else:
-                        order.status = Order.STATUS_PENDING
-                        order.save()
+                        for order_product in order.order_product_set.all():
+                            order_product.status = Order.STATUS_PENDING
+                            order_product.save()
                         add_message(request, ("Email no valido. Orden no enviada", "warning"))
                 else:
                     add_message(request, ("Proveedor: "+provider.name+" sin email. Orden no enviada", "warning"))
         if action == "RECEIVED":
             for order in Order.objects.filter(id__in=json.loads(str(request.POST.get('order_id', "[]")))):
-                order.status = Order.STATUS_RECEIVED
-                order.received_date = now
-                order.save()
+                for order_product in order.order_product_set.all():
+                    order_product.status = Order.STATUS_RECEIVED
+                    order_product.received_date = now
+                    order_product.save()
         if action == "CANCEL":
             for order in Order.objects.filter(id__in=json.loads(str(request.POST.get('order_id', "[]")))):
                 if order.provider.email:
-                    if send_email(order.provider.email, request.POST.get("subject", ""), request.POST.get("text", "")):
-                        order.status = Order.STATUS_CANCELED
-                        order.save()
+                    message = request.POST.get("text", "")
+                    for order_product in order.order_product_set.all():
+                        product = order_product.product
+                        message += "\n"+product.code+" - "+product.name+" "+product.description+". Cantidad: "+str(order_product.amount)
+                    if send_email(order.provider.email, request.POST.get("subject", ""), message):
+                        for order_product in order.order_product_set.all():
+                            order_product.status = Order.STATUS_CANCELED
+                            order_product.save()
                     else:
                         add_message(request, ("Email no valido. Email no enviado", "warning"))
                 else:
@@ -1038,9 +1033,17 @@ def shopping(request):
                     order_product.delete()
                 order.delete()
         return HttpResponseRedirect('/reports/shopping/?start_date='+formatted_start_date+"&end_date="+formatted_end_date)
-    reports_active = "active"
+    dashboard_active = "active"
     shopping_active = "active"
-    orderInputForm = OrderInputForm()
+    order_inputs_forms = {}
+    for i in Order_Product.objects.filter(order__in=orders):
+        form = OrderInputForm(instance=i)
+        if request.user.is_superuser:
+            form.fields['price'].initial = float(i.product.price)
+            form.fields['discount'].initial = float(i.product.discount)
+        form.fields['hidden_price'].initial = float(i.product.price)
+        form.fields['hidden_discount'].initial = float(i.product.discount)
+        order_inputs_forms[i.id] = form
     scripts = ["shopping"]
     messages = get_messages(request)
     return render_to_response('pages/dashboard.html', locals(), context_instance=RequestContext(request))
@@ -1120,3 +1123,12 @@ def backup(request):
                 add_message(request, ("Eliminacion no realizada, seleccione un respaldo", "danger"))
     return HttpResponseRedirect("/settings/")
 
+"""
+agregar a salidas cuantos hay en el almacen de la salida del producto
+nuevos pedidos en pedidos
+boton de devoluciones en salidas
+
+boton de editar entradas,salidas,prestamos,ordenes
+presupuestador
+envio de arachivos csv
+"""

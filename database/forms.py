@@ -8,7 +8,7 @@ from django.utils.html import conditional_escape, format_html
 from django.forms.utils import flatatt
 from django.utils.safestring import mark_safe
 
-from models import Product, Tool, Provider, Appliance, Brand, Lending, Input_Product, Output_Product, Lending_Product, Configuration, BackupManager, Percentage, Organization
+from models import Product, Tool, Provider, Appliance, Brand, Lending, Input_Product, Output_Product, Lending_Product, Order_Product, Configuration, BackupManager, Percentage, Organization
 
 from datetime import datetime
 
@@ -261,14 +261,33 @@ class ConfigurationForm(forms.ModelForm):
         model = Configuration
         fields = "__all__" 
 
+# class OrderInputForm(forms.ModelForm):
+#     date = forms.DateField(widget=DateInput(), label='Fecha', initial=datetime.now())
+#     invoice_number = forms.CharField(max_length=100, label='Numero de Factura', required=False)
+#     storage = forms.ChoiceField(label='Almacen', choices=Product.STORAGE_CHOICES)
+#     organization = forms.ModelChoiceField(queryset=Organization.objects.all(), required=False, label="Organizacion")
+#     amount = forms.IntegerField(label='Cantidad', initial=1)
+#     price = forms.DecimalField(max_digits=9, decimal_places=2, label='Precio de lista', initial=0)
+#     discount = forms.DecimalField(max_digits=9, decimal_places=2, label='Descuento', required=False, initial=0, min_value=0, max_value=100)
+
+#     class Meta:
+#         model = Input_Product
+#         fields = ['date', 'invoice_number', 'storage', 'organization', 'amount', 'price', 'discount']
+
 class OrderInputForm(forms.ModelForm):
+    id = forms.IntegerField(widget = forms.HiddenInput)
     date = forms.DateField(widget=DateInput(), label='Fecha', initial=datetime.now())
     invoice_number = forms.CharField(max_length=100, label='Numero de Factura', required=False)
     storage = forms.ChoiceField(label='Almacen', choices=Product.STORAGE_CHOICES)
+    amount = forms.IntegerField(label='Cantidad', initial=1)
+    price = forms.DecimalField(max_digits=9, decimal_places=2, label='Precio de lista', initial=0)
+    discount = forms.DecimalField(max_digits=9, decimal_places=2, label='Descuento', required=False, initial=0, min_value=0, max_value=100)
+    hidden_price = forms.IntegerField(widget = forms.HiddenInput)
+    hidden_discount = forms.IntegerField(widget = forms.HiddenInput)
 
     class Meta:
-        model = Input_Product
-        fields = ['date', 'invoice_number', 'storage']
+        model = Order_Product
+        fields = ['date', 'invoice_number', 'storage', 'amount', 'price', 'discount']
 
 class BackupForm(forms.Form):
 

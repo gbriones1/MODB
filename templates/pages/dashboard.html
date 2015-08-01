@@ -33,6 +33,9 @@
 	{% if lendings_active %}
 	{% include 'sections/lendingTable.html' %}
 	{% endif %}
+	{% if shopping_active %}
+	{% include 'sections/shoppingTable.html' %}
+	{% endif %}
 	{% if providers_active %}
 	{% include 'sections/providerTable.html' %}
 	{% endif %}
@@ -53,9 +56,6 @@
 	{% endif %}
 {% endif %}
 {% if reports_active %}
-	{% if shopping_active %}
-	{% include 'sections/shoppingTable.html' %}
-	{% endif %}
 	{% if statistics_active %}
 	{% include 'sections/statisticsChart.html' %}
 	{% endif %}

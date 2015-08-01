@@ -168,13 +168,15 @@ class Order(models.Model):
     )
     date = models.DateTimeField(auto_now_add=True)
     provider = models.ForeignKey(Provider)
-    status = models.CharField(max_length=1, choices=STATUS_CHOICES)
-    received_date = models.DateTimeField(null=True)
 
 class Order_Product(models.Model):
     order = models.ForeignKey(Order)
     product = models.ForeignKey(Product)
     amount = models.IntegerField()
+    organization = models.ForeignKey(Organization, null=True, blank=True)
+    storage = models.CharField(max_length=1, choices=Product.STORAGE_CHOICES, null=True, blank=True)
+    status = models.CharField(max_length=1, choices=Order.STATUS_CHOICES, null=True)
+    received_date = models.DateTimeField(null=True)
 
 class Configuration(models.Model):
     sender_email = models.EmailField(null=True)
@@ -200,12 +202,12 @@ admin.site.register(Input, InputAdmin)
 
 class BackupManager(object):
 
-    #DIRECTORY = os.path.join(os.getcwd(), "backups")# if settings.DEBUG else "C:\\MODB\\backups/"
+    # DIRECTORY = os.path.join(os.getcwd(), "backups")# if settings.DEBUG else "C:\\MODB\\backups/"
     DIRECTORY = "C:\\MODB\\backups/"
 
     def get_current_db(self):
         #if settings.DEBUG:
-        #return os.path.join(os.getcwd(), "db.sqlite3")
+        # return os.path.join(os.getcwd(), "db.sqlite3")
         #else:
         return "C:\\MODB\\db.sqlite3"
 
