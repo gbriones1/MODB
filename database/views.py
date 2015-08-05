@@ -1127,11 +1127,13 @@ def backup(request):
 """
 Editar en consignacion redirecciona a Refacciones.
 Eliminar temporizador en notificaciones.
-Agregar precio con descuento al email.
+Agregar precio con descuento al email de salidas.
+Agregar codigo a lista de productos por pedir.
 
+Agregar solicitante en pedidos.
+Nuevos pedidos en pedidos.
 Notificacion para cuando pedido se pasa de stock.
 agregar a salidas cuantos hay en el almacen de la salida del producto
-nuevos pedidos en pedidos
 boton de devoluciones en salidas
 boton de editar entradas, salidas, prestamos.
 presupuestador

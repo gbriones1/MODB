@@ -219,7 +219,7 @@ Gracias.</textarea>
             </div>
             {% for product in order.order_product_set.all %}
             <div class="form-group">
-                <label for="{{ product.product.code }}" class="col-sm-8 control-label">{{ product.product.name }} - {{ product.product.description }}</label>
+                <label for="{{ product.product.code }}" class="col-sm-8 control-label">{{ product.product.code }} - {{ product.product.name }} - {{ product.product.description }}</label>
                 <div class="col-sm-2">
                     <input type="number" class="form-control" min="1" value="{{ product.amount }}" name="{{ product.product.code }}" id="{{ product.product.code }}"></div><a class="btn btn-danger btn-sm col-sm-1 unlist-product"><span class="glyphicon glyphicon-remove"></span></a>
                 </div>
