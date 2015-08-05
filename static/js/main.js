@@ -58,9 +58,9 @@ function showNotification(text, level) {
     	text:"x"
     }))).append(icon+text);
     notifications.append(notice)
-    setTimeout(function() {
-    	notice.alert('close');
-    }, 5000);
+    // setTimeout(function() {
+    // 	notice.alert('close');
+    // }, 5000);
 }
 $('.messages').children().each(function () {
     showNotification($(this).attr("data-message"), $(this).attr("data-level"));

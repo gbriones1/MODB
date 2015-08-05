@@ -563,6 +563,7 @@ def outputs(request):
                 email_text = ""
                 total_sum = 0
                 for product_output in product_outputs:
+                    this_price = float(product_output.product.price)-(float(product_output.product.price)*float(product_output.product.discount)/100)
                     if request.POST.get("dateColumn", ""):
                         email_text += product_output.output_reg.date.strftime("%Y-%m-%d")+"\t"
                     if request.POST.get("employeeColumn"):
@@ -580,10 +581,10 @@ def outputs(request):
                     if request.POST.get("amountColumn"):
                         email_text += str(product_output.amount)+"\t"
                     if request.POST.get("silglePriceColumn"):
-                        email_text += "$"+str(product_output.product.price)+"\t"
+                        email_text += "$"+str(this_price)+"\t"
                     if request.POST.get("totalPriceColumn"):
-                        total_sum += float(product_output.product.price*product_output.amount)
-                        email_text += "$"+str(product_output.product.price*product_output.amount)+"\t"
+                        total_sum += this_price*product_output.amount
+                        email_text += "$"+str(this_price*product_output.amount)+"\t"
                     if request.POST.get("storageColumn"):
                         email_text += product_output.output_reg.get_storage_display()+"\t"
                     email_text += "\n"
@@ -1124,11 +1125,15 @@ def backup(request):
     return HttpResponseRedirect("/settings/")
 
 """
+Editar en consignacion redirecciona a Refacciones.
+Eliminar temporizador en notificaciones.
+Agregar precio con descuento al email.
+
+Notificacion para cuando pedido se pasa de stock.
 agregar a salidas cuantos hay en el almacen de la salida del producto
 nuevos pedidos en pedidos
 boton de devoluciones en salidas
-
-boton de editar entradas,salidas,prestamos,ordenes
+boton de editar entradas, salidas, prestamos.
 presupuestador
-envio de arachivos csv
+envio de arachivos csv.
 """

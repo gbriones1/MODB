@@ -181,9 +181,9 @@ $(".multi-select-filter").change(function () {
 
 $(document).on('click', 'button.edit-modal', function () {
     $('.edit-iframe').attr('data-id', $(this).attr('data-id'));
-    var storage = $('#new input[name="storage"]').val();
+    var storage = location.search.split("storage=")[1]
     if (storage){
-    	$('.edit-iframe').attr('src', '/product/'+$(this).attr('data-id')+'/?storage='+storage);
+    	$('.edit-iframe').attr('src', '/product/'+$(this).attr('data-id')+'/?storage='+storage[0]);
     }
     else{
     	$('.edit-iframe').attr('src', '/product/'+$(this).attr('data-id'));
