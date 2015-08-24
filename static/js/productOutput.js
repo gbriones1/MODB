@@ -209,10 +209,6 @@ $('#multi-email').click(function() {
 		    "bScrollCollapse": true,
 		    "bPaginate": false,
 		    "sDom": '<"top">rt<"bottom"lp><"clear">',
-		    "aoColumnDefs" : [ {
-		        'bSortable' : false,
-		        'aTargets' : [ 0, -1, -2 ]
-		    } ],
 		});
 		$("#email-list_wrapper thead tr input").each(function () {
 			$(this).attr("checked", true)
@@ -240,14 +236,17 @@ $('#order-btn').click(function () {
 				amount: parseInt($(this).find(".needed").text().substring(2)),
 				storage: $(this).attr("data-storage"),
 				organization: $(this).attr("data-organization"),
+				in_storage: $(this).attr("data-in-storage"),
+				storage_tobe: $(this).attr("data-storage-tobe"),
 			});
 		}
 	});
+	$("#new_order form .modal-body").append('<div class="form-group"><label for="id_subject" class="col-sm-2 control-label">Solicitante</label><div class="col-sm-8"><input id="id_claimant" class="form-control" type="text" name="claimant"></div>');
 	$("#new_order form .modal-body").append('<div class="form-group"><label for="id_subject" class="col-sm-2 control-label">Asunto</label><input id="id_subject" class="form-control" type="text" name="subject" value="Muelles Obrero S. de R.L. de C.V."></div>');
 	$("#new_order form .modal-body").append('<div class="form-group"><label for="id_text" class="col-sm-2 control-label">Mensaje</label><textarea id="id_text" name="text" class="form-control" rows="4" cols="50">Por medio de este mensaje les solicitamos el siguiente pedido. Favor de confirmar por esta misma via si está enderado del mismo.\nDuda o aclaración comunicarlo con almacenista a cargo.\nGracias.</textarea></div>');
 	for (var productIdx in productsList){
 		var product = productsList[productIdx];
-		$("#new_order form .modal-body").append('<input type="hidden" value="'+product.storage+'" name="storage'+product.code+'"><input type="hidden" value="'+product.organization+'" name="organization'+product.code+'"><div class="form-group"><label for="'+product.code+'" class="col-sm-8 control-label">'+product.code+' - '+product.name+' - '+product.description+'</label><div class="col-sm-2"><input type="number" class="form-control" min="1" value="'+product.amount+'" name="'+product.code+'" id="'+product.code+'"></div><a class="btn btn-danger btn-sm col-sm-1 unlist-product"><span class="glyphicon glyphicon-remove"></span></a></div>');
+		$("#new_order form .modal-body").append('<input type="hidden" value="'+product.storage+'" name="storage'+product.code+'"><input type="hidden" value="'+product.organization+'" name="organization'+product.code+'"><div class="form-group"><label for="'+product.code+'" class="col-sm-8 control-label">'+product.code+' - '+product.name+' - '+product.description+' Existentes: '+product.in_storage+' Stock: '+product.storage_tobe+'</label><div class="col-sm-2"><input type="number" class="form-control" min="1" value="'+product.amount+'" name="'+product.code+'" id="'+product.code+'"></div><a class="btn btn-danger btn-sm col-sm-1 unlist-product"><span class="glyphicon glyphicon-remove"></span></a></div>');
 	};
 });
 

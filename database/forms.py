@@ -274,6 +274,21 @@ class ConfigurationForm(forms.ModelForm):
 #         model = Input_Product
 #         fields = ['date', 'invoice_number', 'storage', 'organization', 'amount', 'price', 'discount']
 
+class OrderForm(forms.ModelForm):
+    date = forms.DateField(widget=DateInput(), label='Fecha', initial=datetime.now())
+    claimant = forms.CharField(max_length=100, label='Solicitante', required=False)
+    subject = forms.CharField(max_length=100, label='Asunto', required=False, initial="Muelles Obrero S. de R.L. de C.V.")
+    text = forms.CharField(max_length=100, label='Mensaje', required=False, widget=forms.Textarea, initial="Por medio de este mensaje les solicitamos el siguiente pedido. Favor de confirmar por esta misma via si esta enderado del mismo.\nDuda o aclaracion comunicarlo con almacenista a cargo.\nGracias.\n".encode("utf-8"))
+    filter_search = forms.CharField(max_length=100, label='Buscar producto')
+    product = forms.ModelMultipleChoiceField(queryset=Product.objects.all(), required=False, label="Seleccionar productos", widget=ProductSelect(attrs={"size":"10"}))
+    amount = forms.IntegerField(label='Cantidad', initial=1)
+    storage = forms.ChoiceField(label='Almacen', choices=Product.STORAGE_CHOICES)
+    provider = forms.ModelChoiceField(queryset=Provider.objects.all(), required=False, label="Proveedor")
+
+    class Meta:
+        model = Order_Product
+        fields = ['date', 'claimant', 'subject', 'text', 'storage', 'provider', 'filter_search', 'product', 'amount']
+
 class OrderInputForm(forms.ModelForm):
     id = forms.IntegerField(widget = forms.HiddenInput)
     date = forms.DateField(widget=DateInput(), label='Fecha', initial=datetime.now())

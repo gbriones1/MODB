@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.views.decorators.cache import never_cache
 from database.models import Product, Tool, Input, Output, Lending, Input_Product, Output_Product, Lending_Product, Lending_Tool, Provider, Appliance, Brand, Order, Configuration, Order_Product, BackupManager, Percentage, Organization
-from database.forms import ProductForm, ToolForm, ProductInputForm, ProductOutputForm, ProductLendingForm, ToolLendingForm, ProviderForm, ApplianceForm, BrandForm, UpdateProviderForm, UpdateBrandForm, UpdateApplianceForm, ConfigurationForm, OrderInputForm, BackupForm, PercentageForm, UpdatePercentageForm, OrganizationForm, UpdateOrganizationForm
+from database.forms import ProductForm, ToolForm, ProductInputForm, ProductOutputForm, ProductLendingForm, ToolLendingForm, ProviderForm, ApplianceForm, BrandForm, UpdateProviderForm, UpdateBrandForm, UpdateApplianceForm, ConfigurationForm, OrderInputForm, BackupForm, PercentageForm, UpdatePercentageForm, OrganizationForm, UpdateOrganizationForm, OrderForm
 from lib.email_client import send_email
 from datetime import datetime
 import calendar
@@ -43,7 +43,8 @@ def createOrder(provider, products, subject, message, request):
         for product in products:
             message += "\n"+product.code+" - "+product.name+" "+product.description+". Cantidad: "+request.POST.get(product.code, "0")
         if send_email(provider.email, subject, message):
-            order = Order(provider=provider)
+            claimant = request.POST.get("claimant", None)
+            order = Order(provider=provider, claimant=claimant)
             order.save()
             for product in products:
                 organization_id = request.POST.get("organization"+product.code, "")
@@ -938,6 +939,38 @@ def shopping(request):
     orders = Order.objects.filter(date__gte=start_date, date__lte=end_date).order_by('-date')
     if request.method == "POST":
         action = request.POST.get('action', '')
+        if action == "NEW":
+            product_amount = json.loads(request.POST.get("orderProducts", "{}"))
+            storage = request.POST.get("storage", "")
+            claimant = request.POST.get("claimant", None)
+            subject = request.POST.get("subject", "")
+            message = request.POST.get("text", "")
+            date = datetime.strptime(request.POST.get("date", now.strftime("%Y-%m-%d")), "%Y-%m-%d").date()
+            products = Product.objects.filter(code__in=product_amount.keys())
+            if len(products):
+                provider_products = {}
+                for product in products:
+                    if product.provider.id in provider_products.keys():
+                        provider_products[product.provider.id].append(product)
+                    else:
+                        provider_products[product.provider.id] = [product]
+                for provider_id in provider_products.keys():
+                    provider = Provider.objects.get(id=provider_id)
+                    if provider.email:
+                        for product in provider_products[provider_id]:
+                            message += "\n"+product.code+" - "+product.name+" "+product.description+". Cantidad: "+product_amount[product.code]
+                        if send_email(provider.email, subject, message):
+                            order = Order(provider=provider, claimant=claimant)
+                            order.save()
+                            for product in provider_products[provider_id]:
+                                product_order = Order_Product(product=product, amount=product_amount[product.code], order=order, organization=None, storage=storage, status=Order.STATUS_ASKED)
+                                product_order.save()
+                        else:
+                            add_message(request, ("Email no valido. Orden no enviada", "warning"))
+                    else:
+                        add_message(request, ("Proveedor: "+provider.name+" sin email. Orden no enviada", "warning"))
+            else:
+                set_messages(request, [("Ningun producto pedido. Orden no enviada", "warning")])
         if action == "CREATE":
             codes = request.POST.keys()
             codes.remove('csrfmiddlewaretoken')
@@ -1045,6 +1078,7 @@ def shopping(request):
         form.fields['hidden_price'].initial = float(i.product.price)
         form.fields['hidden_discount'].initial = float(i.product.discount)
         order_inputs_forms[i.id] = form
+    form = OrderForm()
     scripts = ["shopping"]
     messages = get_messages(request)
     return render_to_response('pages/dashboard.html', locals(), context_instance=RequestContext(request))
@@ -1129,13 +1163,14 @@ Editar en consignacion redirecciona a Refacciones.
 Eliminar temporizador en notificaciones.
 Agregar precio con descuento al email de salidas.
 Agregar codigo a lista de productos por pedir.
-
-Agregar solicitante en pedidos.
-Nuevos pedidos en pedidos.
+Agregar a salidas cuantos hay en el almacen de la salida del producto por almacen.
 Notificacion para cuando pedido se pasa de stock.
-agregar a salidas cuantos hay en el almacen de la salida del producto
-boton de devoluciones en salidas
-boton de editar entradas, salidas, prestamos.
-presupuestador
-envio de arachivos csv.
+Agregar solicitante en pedidos.
+
+Boton de devoluciones en salidas.
+Nuevos pedidos en pedidos.
+
+Boton de editar entradas, salidas, prestamos.
+Presupuestador.
+Envio de mail en formato csv.
 """

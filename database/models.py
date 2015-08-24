@@ -168,6 +168,7 @@ class Order(models.Model):
     )
     date = models.DateTimeField(auto_now_add=True)
     provider = models.ForeignKey(Provider)
+    claimant = models.CharField(max_length=100, null=True, blank=True)
 
 class Order_Product(models.Model):
     order = models.ForeignKey(Order)
