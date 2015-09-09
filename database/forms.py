@@ -283,11 +283,12 @@ class OrderForm(forms.ModelForm):
     product = forms.ModelMultipleChoiceField(queryset=Product.objects.all(), required=False, label="Seleccionar productos", widget=ProductSelect(attrs={"size":"10"}))
     amount = forms.IntegerField(label='Cantidad', initial=1)
     storage = forms.ChoiceField(label='Almacen', choices=Product.STORAGE_CHOICES)
+    organization = forms.ModelChoiceField(queryset=Organization.objects.all(), required=False, label="Organizacion")
     provider = forms.ModelChoiceField(queryset=Provider.objects.all(), required=False, label="Proveedor")
 
     class Meta:
         model = Order_Product
-        fields = ['date', 'claimant', 'subject', 'text', 'storage', 'provider', 'filter_search', 'product', 'amount']
+        fields = ['date', 'claimant', 'subject', 'text', 'storage', 'organization', 'provider', 'filter_search', 'product', 'amount']
 
 class OrderInputForm(forms.ModelForm):
     id = forms.IntegerField(widget = forms.HiddenInput)

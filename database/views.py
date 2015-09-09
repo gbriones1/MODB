@@ -218,14 +218,14 @@ def lendings(request):
                 for productId, amount in product_amount.iteritems():
                     product = Product.objects.get(code=productId)
                     product_lending = Lending_Product(product=product, amount=amount, lending=lending, returned_amount=0)
-                    if storage == "C":
-                        product.in_consignment -= int(amount)
-                    elif storage == "S":
-                        product.in_stock -= int(amount)
-                    elif storage == "U":
-                        product.in_used -= int(amount)
+                    # if storage == "C":
+                    #     product.in_consignment -= int(amount)
+                    # elif storage == "S":
+                    #     product.in_stock -= int(amount)
+                    # elif storage == "U":
+                    #     product.in_used -= int(amount)
+                    # product.save()
                     product_lending.save()
-                    product.save()
             elif tool_amount and employee and destination:
                 lending = Lending(storage=storage, employee=employee, destination=destination, date=date)
                 lending.save()
@@ -241,15 +241,15 @@ def lendings(request):
             rollback = request.POST.get('rollback', 'false')
             for delete_lending in Lending.objects.filter(id__in=json.loads(str(request.POST.get('lending_id', "[]")))):
                 for product_lending in delete_lending.lending_product_set.all():
-                    if rollback == "true":
-                        product = product_lending.product
-                        if delete_lending.storage == "C":
-                            product.in_consignment += product_lending.amount-product_lending.returned_amount
-                        elif delete_lending.storage == "S":
-                            product.in_stock += product_lending.amount-product_lending.returned_amount
-                        elif delete_lending.storage == "U":
-                            product.in_used += product_lending.amount-product_lending.returned_amount
-                        product.save()
+                    # if rollback == "true":
+                    #     product = product_lending.product
+                    #     if delete_lending.storage == "C":
+                    #         product.in_consignment += product_lending.amount-product_lending.returned_amount
+                    #     elif delete_lending.storage == "S":
+                    #         product.in_stock += product_lending.amount-product_lending.returned_amount
+                    #     elif delete_lending.storage == "U":
+                    #         product.in_used += product_lending.amount-product_lending.returned_amount
+                    #     product.save()
                     product_lending.delete()
                 for tool_lending in delete_lending.lending_tool_set.all():
                     if rollback == "true":
@@ -263,14 +263,14 @@ def lendings(request):
                 for product_lending in return_lending.lending_product_set.all():
                     product = product_lending.product
                     product_lending.returned_amount = int(request.POST["amount"+product.code])
-                    if return_lending.storage == "C":
-                        product.in_consignment += product_lending.returned_amount
-                    elif return_lending.storage == "S":
-                        product.in_stock += product_lending.returned_amount
-                    elif return_lending.storage == "U":
-                        product.in_used += product_lending.returned_amount
+                    # if return_lending.storage == "C":
+                    #     product.in_consignment += product_lending.returned_amount
+                    # elif return_lending.storage == "S":
+                    #     product.in_stock += product_lending.returned_amount
+                    # elif return_lending.storage == "U":
+                    #     product.in_used += product_lending.returned_amount
+                    # product.save()
                     product_lending.save()
-                    product.save()
                 for tool_lending in return_lending.lending_tool_set.all():
                     tool = tool_lending.tool
                     tool_lending.returned_amount = int(request.POST["amount"+tool.code])
@@ -943,6 +943,8 @@ def shopping(request):
             product_amount = json.loads(request.POST.get("orderProducts", "{}"))
             storage = request.POST.get("storage", "")
             claimant = request.POST.get("claimant", None)
+            organization_id = request.POST.get("organization", None)
+            organization = Organization.objects.get(id=organization_id) if organization_id else None
             subject = request.POST.get("subject", "")
             message = request.POST.get("text", "")
             date = datetime.strptime(request.POST.get("date", now.strftime("%Y-%m-%d")), "%Y-%m-%d").date()
@@ -963,7 +965,7 @@ def shopping(request):
                             order = Order(provider=provider, claimant=claimant)
                             order.save()
                             for product in provider_products[provider_id]:
-                                product_order = Order_Product(product=product, amount=product_amount[product.code], order=order, organization=None, storage=storage, status=Order.STATUS_ASKED)
+                                product_order = Order_Product(product=product, amount=product_amount[product.code], order=order, organization=organization, storage=storage, status=Order.STATUS_ASKED)
                                 product_order.save()
                         else:
                             add_message(request, ("Email no valido. Orden no enviada", "warning"))
@@ -1166,9 +1168,9 @@ Agregar codigo a lista de productos por pedir.
 Agregar a salidas cuantos hay en el almacen de la salida del producto por almacen.
 Notificacion para cuando pedido se pasa de stock.
 Agregar solicitante en pedidos.
+Nuevos pedidos en pedidos.
 
 Boton de devoluciones en salidas.
-Nuevos pedidos en pedidos.
 
 Boton de editar entradas, salidas, prestamos.
 Presupuestador.
