@@ -157,7 +157,7 @@ filterProvider.change(function (argument) {
 
 $('table#outputs tfoot th').each( function () {
     var title = $('table#outputs thead th').eq( $(this).index() ).text();
-    if (title != '' && title != "Enviar" && title != "Eliminar"){
+    if (title != '' && title != "Enviar" && title != "Eliminar" && title != "Editar"){
     	$(this).html( '<input type="text" placeholder="Buscar '+title+'" class="form-control" />' );
     }
     else{
@@ -173,7 +173,7 @@ $('table#outputs').dataTable({
     "sDom": '<"top">rt<"bottom"lp><"clear">',
     "aoColumnDefs" : [ {
         'bSortable' : false,
-        'aTargets' : [ 0, -1, -2 ]
+        'aTargets' : [ 0, -1, -2, -3 ]
     } ],
     "aaSorting": [[1,'asc']]
 });
@@ -196,7 +196,8 @@ $('#multi-email').click(function() {
 			var row = $(this).clone();
 			row.find(":first-child").remove();
 			row.find(":last-child").remove();
-			row.find(":last-child").remove();
+            row.find(":last-child").remove();
+            row.find(":last-child").remove();
 			emailListTable.append(row);
 			totalSum += parseFloat(row.find('.product-total').text().substring(1))
 		}

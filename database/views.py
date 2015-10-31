@@ -560,39 +560,79 @@ def outputs(request):
             if not destination:
                 messages.append(("Ningun email seleccionado.", "warning"))
             if not messages:
+                from xml.etree import ElementTree as ET
                 product_outputs = Output_Product.objects.filter(id__in=product_output_ids)
-                email_text = ""
+                tbody = ET.Element('tbody')
+                thead = ET.Element('thead')
+                html = ET.fromstring("<html><body><table></table></body></html>")
+                headers = []
+                rows = []
                 total_sum = 0
                 for product_output in product_outputs:
+                    row = []
                     this_price = float(product_output.product.price)-(float(product_output.product.price)*float(product_output.product.discount)/100)
                     if request.POST.get("dateColumn", ""):
-                        email_text += product_output.output_reg.date.strftime("%Y-%m-%d")+"\t"
+                        if not "Fecha" in headers:
+                            headers.append('Fecha')
+                        row.append(product_output.output_reg.date.strftime("%Y-%m-%d"))
                     if request.POST.get("employeeColumn"):
-                        email_text += product_output.output_reg.employee+"\t"
+                        if not "Empleado" in headers:
+                            headers.append('Empleado')
+                        row.append(product_output.output_reg.employee)
                     if request.POST.get("destinationColumn"):
-                        email_text += product_output.output_reg.destination+"\t"
+                        if not "Destino" in headers:
+                            headers.append('Destino')
+                        row.append(product_output.output_reg.destination)
                     if request.POST.get("codeColumn"):
-                        email_text += product_output.product.code+"\t"
+                        if not "Codigo" in headers:
+                            headers.append('Codigo')
+                        row.append(product_output.product.code)
                     if request.POST.get("brandColumn"):
-                        email_text += product_output.product.brand.name+"\t"
+                        if not "Marca" in headers:
+                            headers.append('Marca')
+                        row.append(product_output.product.brand.name)
                     if request.POST.get("providerColumn"):
-                        email_text += product_output.product.provider.name+"\t"
+                        if not "Proveedor" in headers:
+                            headers.append('Proveedor')
+                        row.append(product_output.product.provider.name)
                     if request.POST.get("nameColumn"):
-                        email_text += product_output.product.name+"\t"
+                        if not "Nombre" in headers:
+                            headers.append('Nombre')
+                        row.append(product_output.product.name)
                     if request.POST.get("amountColumn"):
-                        email_text += str(product_output.amount)+"\t"
-                    if request.POST.get("silglePriceColumn"):
-                        email_text += "$"+str(this_price)+"\t"
+                        if not "Cantidad" in headers:
+                            headers.append('Cantidad')
+                        row.append(str(product_output.amount))
+                    if request.POST.get("singlePriceColumn"):
+                        if not "Precio Unitario" in headers:
+                            headers.append('Precio Unitario')
+                        row.append("$"+str(this_price))
                     if request.POST.get("totalPriceColumn"):
+                        if not "Precio Total" in headers:
+                            headers.append('Precio Total')
                         total_sum += this_price*product_output.amount
-                        email_text += "$"+str(this_price*product_output.amount)+"\t"
+                        row.append("$"+str(this_price*product_output.amount))
                     if request.POST.get("storageColumn"):
-                        email_text += product_output.output_reg.get_storage_display()+"\t"
-                    email_text += "\n"
-                email_text += "\n"
-                if request.POST.get("totalPriceColumn"):
-                    email_text += "Total:\t$"+str(total_sum)
-                if not send_email(destination, "Reporte de salida", email_text):
+                        if not "Almacen" in headers:
+                            headers.append('Almacen')
+                        row.append(product_output.output_reg.get_storage_display())
+                    rows.append(row)
+                tr = ET.Element('tr')
+                for header in headers:
+                    tr.append(ET.fromstring('<th>'+header+'</th>'))
+                thead.append(tr)
+                csv_content = ','.join(headers)+"\n"
+                for row in rows:
+                    tr = ET.Element('tr')
+                    for data in row:
+                        tr.append(ET.fromstring('<td>'+data+'</td>'))
+                    tbody.append(tr)
+                    csv_content += ','.join(row)+"\n"
+                if "Precio Total" in headers:
+                    html[0][0].append(ET.fromstring('<tfoot><tr><th colspan="'+str(headers.index("Precio Total"))+'" style="text-align: right;">Total</th><th>$'+str(total_sum)+'</th></tr></tfoot>'))
+                html[0][0].append(tbody)
+                html[0][0].append(thead)
+                if not send_email(destination, "Reporte de salida", "", parts=[{'type':'html', 'content':ET.tostring(html)}], attachments=[{'filename':'salida.csv', 'content':csv_content}]):
                     messages.append(("Correo de registro de salida no enviado, correo no valido", "warning"))
             else:
                 messages.append(("Seleccion de salidas no enviada.", "error"))
@@ -1161,18 +1201,8 @@ def backup(request):
     return HttpResponseRedirect("/settings/")
 
 """
-Editar en consignacion redirecciona a Refacciones.
-Eliminar temporizador en notificaciones.
-Agregar precio con descuento al email de salidas.
-Agregar codigo a lista de productos por pedir.
-Agregar a salidas cuantos hay en el almacen de la salida del producto por almacen.
-Notificacion para cuando pedido se pasa de stock.
-Agregar solicitante en pedidos.
-Nuevos pedidos en pedidos.
-
-Boton de devoluciones en salidas.
-
+Envio de mail en formato csv.
+Tabla de devoluciones. Fecha, Persona que devuelve, producto, cantidad y la informacion de la salida.
 Boton de editar entradas, salidas, prestamos.
 Presupuestador.
-Envio de mail en formato csv.
 """

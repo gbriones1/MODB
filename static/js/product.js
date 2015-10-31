@@ -285,30 +285,69 @@ if (sessionStorage.getItem("NewProduct")){
 	});
 }
 
-$('#pricing-btn').click(function() {
+function calculateRealPercentage () {
 	var emailListTable = $('#email-list tbody');
+	var percentage = $('input[name="percentage"]:checked').val().slice(-1)
 	var totalSum1 = 0;
 	var totalSum2 = 0;
 	var totalSum3 = 0;
+	emailListTable.find('tr').each(function () {
+		var amount = parseInt($(this).find('td.amount input').val());
+		var p1 = parseFloat($(this).find('td.unit-price').attr("data-p1"));
+		var p2 = parseFloat($(this).find('td.unit-price').attr("data-p2"));
+		var p3 = parseFloat($(this).find('td.unit-price').attr("data-p3"));
+		if (percentage == 1){
+			$(this).find('td.unit-price').text("$"+p1.toFixed(2));
+			$(this).find('td.total-price').text("$"+p1.toFixed(2)*amount);
+		}
+		else if (percentage == 2){
+			$(this).find('td.unit-price').text("$"+p2.toFixed(2));
+			$(this).find('td.total-price').text("$"+p2.toFixed(2)*amount);
+		}
+		else if (percentage == 3){
+			$(this).find('td.unit-price').text("$"+p3.toFixed(2));
+			$(this).find('td.total-price').text("$"+p3.toFixed(2)*amount);
+		}
+		totalSum1 += p1*amount;
+		totalSum2 += p2*amount;
+		totalSum3 += p3*amount;
+	});
+	$("p.percentage1").text("$"+totalSum1.toFixed(2));
+	$("p.percentage2").text("$"+totalSum2.toFixed(2));
+	$("p.percentage3").text("$"+totalSum3.toFixed(2));
+}
+
+$(document).on('change', 'td.amount input', function () {
+	calculateRealPercentage()
+});
+
+$(document).on('change', 'input[name="percentage"]', function () {
+	calculateRealPercentage()
+});
+
+$('#pricing-btn').click(function() {
+	var emailListTable = $('#email-list tbody');
 	emailListTable.empty()
 	$("table#products tbody tr").each(function () {
 		if ($(this).find(".checkthis").is(":checked")){
 			var row = $(this).clone();
-			totalSum1 += parseFloat(row.attr("data-percentage-one"));
-			totalSum2 += parseFloat(row.attr("data-percentage-two"));
-			totalSum3 += parseFloat(row.attr("data-percentage-three"));
+			var p1 = parseFloat(row.attr("data-percentage-one"));
+			var p2 = parseFloat(row.attr("data-percentage-two"));
+			var p3 = parseFloat(row.attr("data-percentage-three"));
 			row.find(":first-child").remove();
 			row.find(":last-child").remove();
 			row.find(":last-child").remove();
 			row.find(":last-child").remove();
 			row.find(":last-child").remove();
 			row.find(":last-child").remove();
+			row.find(":last-child").remove();
+			row.append('<td class="amount"><input type="number" class="form-control" name="amount'+row.attr('id')+'"" value="1" min="1"></td>');
+			row.append('<td class="unit-price" data-p1="'+p1+'", data-p2="'+p2+'" data-p3="'+p3+'">$'+p1.toFixed(2)+'</td>');
+			row.append('<td class="total-price">$'+p1.toFixed(2)+'</td>');
 			emailListTable.append(row);
 		}
 	});
-	$("p.percentage1").text("$"+totalSum1.toFixed(2));
-	$("p.percentage2").text("$"+totalSum2.toFixed(2));
-	$("p.percentage3").text("$"+totalSum3.toFixed(2));
+	calculateRealPercentage();
 	var emailList = $('table#email-list')
 	if (!emailList.hasClass("dataTable")){
 		emailList.dataTable({
@@ -318,7 +357,7 @@ $('#pricing-btn').click(function() {
 		    "sDom": '<"top">rt<"bottom"lp><"clear">',
 		    "aoColumnDefs" : [ {
 		        'bSortable' : false,
-		        'aTargets' : [ 0, -1, -2 ]
+		        'aTargets' : [ 0, -1, -2, -3 ]
 		    } ],
 		});
 		$("#email-list_wrapper thead tr input").each(function () {

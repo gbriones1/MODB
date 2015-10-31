@@ -5,7 +5,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from database.models import Configuration
 
-def send_email(destination, subject, text, files=[]):
+def send_email(destination, subject, text, files=[], parts=[], attachments=[]):
     success = False
     conf = Configuration.objects.all()[0]
     gmail_user = conf.sender_email
@@ -26,6 +26,14 @@ def send_email(destination, subject, text, files=[]):
 
     message.attach(MIMEText(text.encode("utf-8"), 'plain', 'utf-8'))
 
+    for part in parts:
+        message.attach(MIMEText(part["content"].encode("utf-8"), part["type"], 'utf-8'))
+
+    for attachment in attachments:
+        attach_file=MIMEApplication(attachment["content"])
+        attach_file.add_header('Content-Disposition', 'attachment', filename=attachment["filename"])
+        message.attach(attach_file)
+
     for f in files or []:
         with open(f, "rb") as fil:
             attach_file=MIMEApplication(fil.read())
@@ -45,5 +53,6 @@ def send_email(destination, subject, text, files=[]):
         print 'Successfully sent the mail'
     except Exception as e:
         print "Failed to send mail"
+        print e
     return success
 
