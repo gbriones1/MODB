@@ -20,7 +20,7 @@ def send_email(destination, subject, text, files=[], parts=[], attachments=[]):
     #     Subject=subject
     # )
     message = MIMEMultipart()
-    message['Subject'] = subject 
+    message['Subject'] = subject
     message['From'] = FROM
     message['To'] = ', '.join(TO)
 
@@ -30,7 +30,7 @@ def send_email(destination, subject, text, files=[], parts=[], attachments=[]):
         message.attach(MIMEText(part["content"].encode("utf-8"), part["type"], 'utf-8'))
 
     for attachment in attachments:
-        attach_file=MIMEApplication(attachment["content"])
+        attach_file=MIMEApplication(attachment["content"].encode('utf-8'))
         attach_file.add_header('Content-Disposition', 'attachment', filename=attachment["filename"])
         message.attach(attach_file)
 
@@ -41,7 +41,7 @@ def send_email(destination, subject, text, files=[], parts=[], attachments=[]):
             message.attach(attach_file)
 
     try:
-        server = smtplib.SMTP("smtp.gmail.com", 587) 
+        server = smtplib.SMTP("smtp.gmail.com", 587)
         #server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
         server.ehlo()
         server.starttls()
@@ -55,4 +55,3 @@ def send_email(destination, subject, text, files=[], parts=[], attachments=[]):
         print "Failed to send mail"
         print e
     return success
-

@@ -625,7 +625,7 @@ def outputs(request):
                 for row in rows:
                     tr = ET.Element('tr')
                     for data in row:
-                        tr.append(ET.fromstring('<td>'+data+'</td>'))
+                        tr.append(ET.fromstring('<td>'+data.encode('utf-8')+'</td>'))
                     tbody.append(tr)
                     csv_content += ','.join(row)+"\n"
                 if "Precio Total" in headers:
@@ -1201,7 +1201,6 @@ def backup(request):
     return HttpResponseRedirect("/settings/")
 
 """
-Envio de mail en formato csv.
 Tabla de devoluciones. Fecha, Persona que devuelve, producto, cantidad y la informacion de la salida.
 Boton de editar entradas, salidas, prestamos.
 Presupuestador.
