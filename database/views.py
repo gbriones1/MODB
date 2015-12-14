@@ -57,10 +57,39 @@ def createOrder(provider, products, subject, message, request):
     else:
         add_message(request, ("Proveedor: "+provider.name+" sin email. Orden no enviada", "warning"))
 
+def correct_codes():
+    double_dashed = Product.objects.filter(code__regex=r'.*-.*-.*')
+    if double_dashed:
+        for product in double_dashed:
+            old_code = product.code
+            new_code = product.code.split("-")[0]+"-"+"".join(product.code.split('-')[1:])
+            counter = 0
+            while Product.objects.filter(code=new_code):
+                new_code += "__"+str(counter)
+                counter += 1
+            product.code = new_code
+            product.save()
+            old_product = Product.objects.get(code=old_code)
+            old_product.delete()
+    slashed = Product.objects.filter(code__regex=r'.*/.*')
+    if slashed:
+        for product in slashed:
+            old_code = product.code
+            new_code = product.code.replace("/", "")
+            counter = 0
+            while Product.objects.filter(code=new_code):
+                new_code += "__"+str(counter)
+                counter += 1
+            product.code = new_code
+            product.save()
+            old_product = Product.objects.get(code=old_code)
+            old_product.delete()
+
 ### DASHBOARD VIEW ###
 
 @login_required
 def dashboard(request):
+    correct_codes()
     dashboard_active = "active"
     filter_active = {}
     products = Product.objects.all()
