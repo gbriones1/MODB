@@ -94,7 +94,7 @@ class Product(models.Model):
         return self.code+" - "+self.name.encode('utf8')+" - "+self.description
 
     def __unicode__(self):
-        return self.code+" - "+self.name.encode('utf8')+" - "+self.description
+        return self.code+" - "+self.name+" - "+self.description
 
 class Input(models.Model):
     date = models.DateTimeField()
