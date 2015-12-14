@@ -96,7 +96,7 @@ class ProductForm(forms.ModelForm):
             "stock_tobe",
             "in_consignment",
             "consignment_tobe",
-            ] 
+            ]
 
 class ToolForm(forms.ModelForm):
     code = forms.CharField(max_length=30, label='Codigo')
@@ -107,7 +107,7 @@ class ToolForm(forms.ModelForm):
 
     class Meta:
         model = Tool
-        fields = "__all__" 
+        fields = "__all__"
 
 class ProductInputForm(forms.ModelForm):
     date = forms.DateField(widget=DateInput(), label='Fecha', initial=datetime.now())
@@ -211,7 +211,7 @@ class UpdateOrganizationForm(forms.ModelForm):
 
     class Meta:
         model = Organization
-        fields = "__all__" 
+        fields = "__all__"
 
 class ApplianceForm(forms.ModelForm):
     name = forms.CharField(max_length=100, label='Nombre')
@@ -248,7 +248,7 @@ class UpdatePercentageForm(forms.ModelForm):
 
     class Meta:
         model = Percentage
-        fields = "__all__" 
+        fields = "__all__"
 
 class ConfigurationForm(forms.ModelForm):
     sender_email = forms.EmailField(label="Email para ordenes", required=False)
@@ -259,7 +259,7 @@ class ConfigurationForm(forms.ModelForm):
 
     class Meta:
         model = Configuration
-        fields = "__all__" 
+        fields = "__all__"
 
 # class OrderInputForm(forms.ModelForm):
 #     date = forms.DateField(widget=DateInput(), label='Fecha', initial=datetime.now())

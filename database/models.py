@@ -90,8 +90,11 @@ class Product(models.Model):
     stock_tobe =models.IntegerField()
     consignment_tobe =models.IntegerField()
 
+    def __str__(self):
+        return self.code+" - "+self.name.encode('utf8')+" - "+self.description
+
     def __unicode__(self):
-        return self.code+" - "+self.name+" - "+self.description
+        return self.code+" - "+self.name.encode('utf8')+" - "+self.description
 
 class Input(models.Model):
     date = models.DateTimeField()
@@ -104,7 +107,7 @@ class Input(models.Model):
 
 class Organization(models.Model):
     name = models.CharField(max_length=200)
-    
+
     def __unicode__(self):
         return self.name
 
@@ -186,8 +189,8 @@ class Configuration(models.Model):
     mailOnPriceChange = models.BooleanField(default=True)
     mailOnNegativeValues = models.BooleanField(default=True)
     # destination del sistema para enviar un correo de adgoritmo para mi hermoso amorcito te amo te amo :*
-    # la longitud de mi inteligencia va a ayudar a mi papito clo voy a ayudar siempre 
-    
+    # la longitud de mi inteligencia va a ayudar a mi papito clo voy a ayudar siempre
+
 class ProductAdmin(admin.ModelAdmin):
     pass
 
@@ -236,6 +239,6 @@ class BackupManager(object):
     # def send_backup(self, backup_file):
     #     conf = Configuration.objects.all()[0]
     #     return conf.receiver_email and send_email(conf.receiver_email, "Respaldo de la Base de Datos", "", files=[backup_file])
-            
+
     def upload_backup(self, file):
         pass
