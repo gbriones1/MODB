@@ -192,6 +192,7 @@ $(document).on('click', 'button.edit-modal', function () {
 
 $(document).on('click', '#edit button[type="submit"]', function (argument) {
 	var form = $('.edit-iframe').contents().find('form').clone();
+	form.find("select[name='appliance']").val($('.edit-iframe').contents().find('form').find("select[name='appliance']").val())
 	form.hide();
 	form.appendTo($('body'));
 	form.submit();
